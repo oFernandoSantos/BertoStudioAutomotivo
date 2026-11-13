@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* estreito: = tela mais estreita que 4:3 (vídeo para de cortar as laterais) */
+@custom-variant estreito (@media (max-aspect-ratio: 4/3));
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italiana&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300..700&display=swap');
+
+@theme{
+  --color-primaria: #562AB6; /* roxo do logo (B e "TO") */
+  --color-secundaria: #111111;
+  --font-family-primaria: 'inter', sans-serif;
+  --font-family-secundaria: 'Italiana', serif;
+  --color-fundo-primario: #1A0B33;
+  --color-fundo-secundario: #0D0D0D;
+  /* bordas: o mesmo roxo do logo; e o brilho neon delas */
+  --color-borda: #562AB6;
+  --shadow-neon: 0 0 10px rgba(86, 42, 182, 0.5), inset 0 0 8px rgba(86, 42, 182, 0.18);
+}
+
+/* Botão "Ver serviços": no roxo das bordas e do degradê (--color-borda) */
+.button-primaria {
+  border: solid 1px var(--color-borda);
+  border-radius: 9999px; /* pílula, igual ao botão do cabeçalho */
+  background-color: var(--color-borda);
+  color: #fff;
+  cursor: pointer;
+  height: 46px;
+  padding: 0 32px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.button-primaria:hover {
+  background-color: #6634CC;
+  border-color: #6634CC;
+}
+
+.button-secundario {
+  border-radius: 5px;
+  background-color: var(--color-primaria);
+  color: var(--color-secundaria);
+  cursor: pointer;
+  width: 135px;
+  height: 32px;
+  font-size: 12px;
+  padding: 10px 25px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.button-secundario:hover {
+  background-color: var(--color-secundaria);
+  border: solid 0.5px var(--color-primaria);
+  color: var(--color-primaria);
+}
+
+.bg-header{
+  background-color: var(--color-secundaria);
+  opacity: 5%;
+}
+
+.border-verde{
+  border: solid 0.5px var(--color-primaria);
+  border-radius: 30px;
+}
+
+.shadow-primaria {
+  box-shadow: 0 4px 10px rgba(86, 42, 182, 0.4), 0 8px 20px rgba(86, 42, 182, 0.2);
+}
+
+/* Brilho neon em volta das frases do topo, no mesmo roxo das bordas (--color-borda) */
+.text-shadow {
+  text-shadow:
+    0 0 3px rgba(86, 42, 182, 0.45),
+    0 0 10px rgba(86, 42, 182, 0.35),
+    0 0 24px rgba(86, 42, 182, 0.25);
+}
+
+/* A barra inteira */
+::-webkit-scrollbar {
+  width: 12px; /* Largura da barra */
+}
+
+/* Parte onde a barra desliza */
+::-webkit-scrollbar-track {
+  background: black; /* Cor do fundo */
+  border-radius: 6px;
+}
+
+/* A própria barra que você arrasta */
+::-webkit-scrollbar-thumb {
+  background-color: #562AB6; /* Cor da barra */
+  border-radius: 6px;
+  border: 3px solid #000000; /* Espaço entre thumb e track */
+}
+
+/* Ao passar o mouse */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #6634CC;
+}
+
+
+.transition-appear {
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.translate-y-10 {
+  transform: translateY(2.5rem); /* Tailwind translate-y-10 */
+}
+
+/* Trilho do carrossel: rola na horizontal sem mostrar a barra de rolagem */
+.sem-barra {
+  scrollbar-width: none;
+}
+.sem-barra::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* Links do menu fecham o <details> ao navegar */
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Tela estreita (vídeo 4:3 no topo): a base do próprio vídeo some em degradê no fundo
+   preto, sem emenda. Máscara no vídeo evita a linha que uma faixa por cima deixava. */
+@media (max-aspect-ratio: 4/3) {
+  .js-hero-video {
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, rgba(0, 0, 0, 0.6) 75%, transparent 98%);
+    mask-image: linear-gradient(to bottom, #000 55%, rgba(0, 0, 0, 0.6) 75%, transparent 98%);
+  }
+}
+
+
+/* Efeito vidro (estilo Apple): menu do cabeçalho e menu do celular */
+.componente-vidro {
+  background: rgba(255, 255, 255, 0.1); /* fundo branco semitransparente */
+  backdrop-filter: blur(12px); /* desfoque do que está atrás */
+  -webkit-backdrop-filter: blur(12px); /* Safari/iOS */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* borda suave */
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+nav.componente-vidro.rounded-full {
+  border-radius: 9999px; /* o menu do cabeçalho continua em formato de pílula */
+}
+
+/* Vidro líquido (estilo Apple) no menu do cabeçalho */
+.liquid-glass {
+  border-radius: 60px; /* formato de cápsula */
+  height: 36px; /* mesma altura do botão do WhatsApp */
+  padding: 0 28px;
+  /* transparência com gradiente sutil de luz */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  /* desfoque; no Chrome/Edge soma a distorção óptica do filtro SVG (#liquid-refraction no HTML).
+     Navegadores que não aceitam o url() ficam só com a primeira linha (desfoque). */
+  backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px) url(#liquid-refraction);
+  -webkit-backdrop-filter: blur(2px);
+  /* reflexos internos que dão a espessura 3D do vidro */
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0),
+    inset 0 1px 2px rgba(255, 255, 255, 0.45),
+    inset 0 -3px 6px rgba(0, 0, 0, 0),
+    inset 4px 0 8px rgba(255, 255, 255, 0.08),
+    inset -4px 0 8px rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.45); /* borda externa brilhante */
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.liquid-glass:hover {
+  transform: scale(1.02);
+}
