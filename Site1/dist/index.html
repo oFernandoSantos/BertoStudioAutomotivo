@@ -2,17 +2,19 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- sem zoom: pinça e toque duplo não ampliam o site -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta
       name="description"
       content="Berto Studio Automotivo — estética automotiva em Colombo - PR: cuidados, lavagens, polimento, restauração de faróis e acessórios."
     />
 
     <!-- Fonts -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap"
       rel="stylesheet"
     />
 
@@ -23,7 +25,7 @@
     />
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=8" />
+    <link rel="stylesheet" href="css/styles.css?v=14" />
     <link rel="icon" type="image/png" href="imgs/favicon.png?v=1" />
     <link rel="apple-touch-icon" href="imgs/apple-touch-icon.png" />
 
@@ -43,7 +45,7 @@
       <div class="flex justify-between items-center h-full w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <a href="#inicio" class="flex items-center shrink-0">
           <img
-            src="imgs/logo.png"
+            src="imgs/logo.webp" width="480" height="320"
             alt="Berto Studio Automotivo"
             class="h-12 sm:h-14 lg:h-16 w-auto mix-blend-screen"
           />
@@ -120,7 +122,7 @@
 
     <main>
       <!-- HERO: vídeo controlado pelo scroll (GSAP ScrollTrigger) -->
-      <section id="inicio" class="js-hero @container relative h-screen estreito:h-[calc(75vw+9rem)] overflow-hidden">
+      <section id="inicio" class="js-hero @container relative h-screen estreito:h-[calc(75vw+9.5rem)] overflow-hidden">
         <!-- Tela larga: vídeo em tela cheia; ao estreitar, as laterais vão sendo cortadas.
              O corte para em 4:3 (estreito:), que ainda mostra o letreiro da parede: a partir
              daí o vídeo fica 4:3 colado no topo (sob o cabeçalho) e os textos descem para baixo dele.
@@ -137,9 +139,9 @@
         ></div>
 
         <div
-          class="js-caption absolute inset-x-0 bottom-20 estreito:top-[calc(75cqw-1.5rem)] estreito:bottom-auto px-6 text-center text-white"
+          class="js-caption absolute inset-x-0 bottom-20 estreito:top-[calc(75cqw-2.5rem)] estreito:bottom-auto px-6 text-center text-white"
         >
-          <h1 class="text-[2rem] leading-tight sm:text-4xl md:text-6xl font-semibold text-shadow">
+          <h1 class="text-[2rem] estreito:text-[1.75rem] leading-tight sm:text-4xl md:text-6xl font-semibold text-shadow">
             Seu carro com brilho de estúdio.
           </h1>
           <p class="text-lg md:text-2xl pt-3.5 text-neutral-200">
@@ -151,9 +153,9 @@
         </div>
 
         <div
-          class="js-caption opacity-0 absolute inset-x-0 bottom-20 estreito:top-[calc(75cqw-1.5rem)] estreito:bottom-auto px-6 text-center text-white"
+          class="js-caption opacity-0 absolute inset-x-0 bottom-20 estreito:top-[calc(75cqw-2.5rem)] estreito:bottom-auto px-6 text-center text-white"
         >
-          <h2 class="text-[2rem] leading-tight sm:text-4xl md:text-6xl font-semibold text-shadow">
+          <h2 class="text-[2rem] estreito:text-[1.75rem] leading-tight sm:text-4xl md:text-6xl font-semibold text-shadow">
             Cada detalhe, de todos os ângulos.
           </h2>
           <p class="text-lg md:text-2xl pt-3.5 text-neutral-200">
@@ -162,9 +164,9 @@
         </div>
 
         <div
-          class="js-caption opacity-0 absolute inset-x-0 bottom-20 estreito:top-[calc(75cqw-1.5rem)] estreito:bottom-auto px-6 text-center text-white"
+          class="js-caption opacity-0 absolute inset-x-0 bottom-20 estreito:top-[calc(75cqw-2.5rem)] estreito:bottom-auto px-6 text-center text-white"
         >
-          <h2 class="text-[2rem] leading-tight sm:text-4xl md:text-6xl font-semibold text-shadow">
+          <h2 class="text-[2rem] estreito:text-[1.75rem] leading-tight sm:text-4xl md:text-6xl font-semibold text-shadow">
             Proteção que dura.
           </h2>
           <p class="text-lg md:text-2xl pt-3.5 pb-7 text-neutral-200">
@@ -180,75 +182,225 @@
 
       <!-- SERVIÇOS -->
       <section id="servicos" class="bg-black text-white py-28 estreito:pt-6 px-6">
-        <div class="text-center pb-14">
-          <h2 class="text-4xl font-semibold js-reveal">Nossos serviços</h2>
-          <p class="text-lg text-neutral-500 pt-4 js-reveal">
+        <div class="text-center pb-10 sm:pb-14">
+          <h2 class="text-[1.75rem] leading-tight sm:text-4xl font-semibold js-reveal">Nossos serviços</h2>
+          <p class="text-base sm:text-lg text-neutral-500 pt-4 js-reveal">
             Do cuidado do dia a dia à proteção completa da pintura.
           </p>
         </div>
 
         <div
-          class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
         >
           <div
-            class="group relative top-0 bg-fundo-secundario p-6 rounded-lg border border-white/20 transition-[top,border-color] duration-300 hover:-top-1.5 hover:border-white/35 js-reveal"
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
           >
-            <i class="bi bi-droplet-fill text-primaria text-3xl inline-block transition-transform duration-300 group-hover:scale-115"></i>
-            <h3 class="font-semibold text-lg pt-3">Lavagem detalhada</h3>
-            <p class="text-neutral-400">
-              Lavagem técnica com produtos específicos, sem riscos na pintura.
-            </p>
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/lavagem.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Lavagem</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">Lavagem técnica com produtos específicos, sem riscos na pintura.</p>
+            </div>
           </div>
 
           <div
-            class="group relative top-0 bg-fundo-secundario p-6 rounded-lg border border-white/20 transition-[top,border-color] duration-300 hover:-top-1.5 hover:border-white/35 js-reveal"
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
           >
-            <i class="bi bi-stars text-primaria text-3xl inline-block transition-transform duration-300 group-hover:scale-115"></i>
-            <h3 class="font-semibold text-lg pt-3">Polimento técnico</h3>
-            <p class="text-neutral-400">
-              Remoção de riscos e hologramas, devolvendo o brilho original.
-            </p>
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/lavagem-motor.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Lavagem de motor</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">Limpeza segura do cofre do motor, com proteção das partes elétricas.</p>
+            </div>
           </div>
 
           <div
-            class="group relative top-0 bg-fundo-secundario p-6 rounded-lg border border-white/20 transition-[top,border-color] duration-300 hover:-top-1.5 hover:border-white/35 js-reveal"
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
           >
-            <i class="bi bi-gem text-primaria text-3xl inline-block transition-transform duration-300 group-hover:scale-115"></i>
-            <h3 class="font-semibold text-lg pt-3">Vitrificação</h3>
-            <p class="text-neutral-400">
-              Camada de proteção cerâmica com brilho intenso e fácil limpeza.
-            </p>
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/higienizacao.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Higienização interna</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">Limpeza profunda de bancos, carpetes, teto e painel.</p>
+            </div>
           </div>
 
           <div
-            class="group relative top-0 bg-fundo-secundario p-6 rounded-lg border border-white/20 transition-[top,border-color] duration-300 hover:-top-1.5 hover:border-white/35 js-reveal"
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
           >
-            <i class="bi bi-wind text-primaria text-3xl inline-block transition-transform duration-300 group-hover:scale-115"></i>
-            <h3 class="font-semibold text-lg pt-3">Higienização interna</h3>
-            <p class="text-neutral-400">
-              Limpeza profunda de bancos, carpetes, teto e painel.
-            </p>
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/polimento.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Polimento</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">Remoção de riscos e hologramas, devolvendo o brilho original.</p>
+            </div>
           </div>
 
           <div
-            class="group relative top-0 bg-fundo-secundario p-6 rounded-lg border border-white/20 transition-[top,border-color] duration-300 hover:-top-1.5 hover:border-white/35 js-reveal"
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
           >
-            <i class="bi bi-shield-fill-check text-primaria text-3xl inline-block transition-transform duration-300 group-hover:scale-115"></i>
-            <h3 class="font-semibold text-lg pt-3">Película de proteção</h3>
-            <p class="text-neutral-400">
-              PPF contra pedras, riscos e desgaste do dia a dia.
-            </p>
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/vitrificacao.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Vitrificação</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">Camada de proteção cerâmica com brilho intenso e fácil limpeza.</p>
+            </div>
           </div>
 
           <div
-            class="group relative top-0 bg-fundo-secundario p-6 rounded-lg border border-white/20 transition-[top,border-color] duration-300 hover:-top-1.5 hover:border-white/35 js-reveal"
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
           >
-            <i class="bi bi-brightness-high-fill text-primaria text-3xl inline-block transition-transform duration-300 group-hover:scale-115"></i>
-            <h3 class="font-semibold text-lg pt-3">Revitalização de faróis</h3>
-            <p class="text-neutral-400">
-              Faróis transparentes de novo, com mais segurança à noite.
-            </p>
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/cristalizacao.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Cristalização de vidros</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">A água escorre do vidro e a visibilidade na chuva melhora.</p>
+            </div>
           </div>
+
+          <div
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
+          >
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/farois.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Restauração de faróis</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">Faróis transparentes de novo, com mais segurança à noite.</p>
+            </div>
+          </div>
+
+          <div
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
+          >
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/insulfilm.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Insulfilm</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">Película nos vidros contra calor, raios UV e olhares de fora.</p>
+            </div>
+          </div>
+
+          <div
+            class="card-servico group relative top-0 overflow-hidden hover:-top-1 js-reveal"
+          >
+            <div class="relative aspect-[16/10] overflow-hidden">
+              <img
+                src="imgs/servicos/acessorios.webp?v=6"
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <!-- degradê: a base da foto se funde com o fundo do texto -->
+              <div class="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
+            <div class="p-5 pt-3">
+                <h3 class="font-semibold text-base sm:text-lg leading-snug">Acessórios</h3>
+                <p class="text-sm text-neutral-400 pt-1 leading-relaxed">Instalação de acessórios para deixar o carro do seu jeito.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto pt-10 flex items-center justify-center gap-2 text-center js-reveal">
+          <p class="text-neutral-400">Não encontrou o que procura? A gente avalia o seu carro.</p>
+          <a
+            href="https://wa.me/5541996817106" data-whatsapp
+            target="_blank"
+            rel="noopener"
+            aria-label="Pedir orçamento no WhatsApp"
+            class="shrink-0 text-xl leading-none text-[#25D366] hover:text-[#5CFF9D] transition-colors"
+            ><i class="bi bi-whatsapp"></i></a
+          >
         </div>
       </section>
 
@@ -259,8 +411,8 @@
            Para mais fotos, copie um <figure> e mude o número e o texto. -->
       <section id="trabalhos" class="bg-black text-white py-28">
         <div class="text-center pb-14 px-6">
-          <h2 class="text-4xl font-semibold js-reveal">Trabalhos realizados</h2>
-          <p class="text-lg text-neutral-500 pt-4 js-reveal">
+          <h2 class="text-[1.75rem] leading-tight sm:text-4xl font-semibold js-reveal">Trabalhos realizados</h2>
+          <p class="text-base sm:text-lg text-neutral-500 pt-4 js-reveal">
             Alguns carros que passaram pelo estúdio.
           </p>
         </div>
@@ -268,7 +420,7 @@
         <div class="js-trilho overflow-x-auto sem-barra w-full cursor-grab active:cursor-grabbing js-reveal">
           <div class="js-carrossel flex w-max">
             <figure
-              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex items-center justify-center"
+              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-primaria bg-neutral-900 flex items-center justify-center"
             >
               <i class="bi bi-camera text-neutral-700 text-5xl transition-transform duration-500 ease-out group-hover:scale-125"></i>
               <img
@@ -286,7 +438,7 @@
             </figure>
 
             <figure
-              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex items-center justify-center"
+              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-primaria bg-neutral-900 flex items-center justify-center"
             >
               <i class="bi bi-camera text-neutral-700 text-5xl transition-transform duration-500 ease-out group-hover:scale-125"></i>
               <img
@@ -304,7 +456,7 @@
             </figure>
 
             <figure
-              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex items-center justify-center"
+              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-primaria bg-neutral-900 flex items-center justify-center"
             >
               <i class="bi bi-camera text-neutral-700 text-5xl transition-transform duration-500 ease-out group-hover:scale-125"></i>
               <img
@@ -322,12 +474,12 @@
             </figure>
 
             <figure
-              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex items-center justify-center"
+              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-primaria bg-neutral-900 flex items-center justify-center"
             >
               <i class="bi bi-camera text-neutral-700 text-5xl transition-transform duration-500 ease-out group-hover:scale-125"></i>
               <img
                 src="imgs/trabalhos/4.jpg"
-                alt="Lavagem detalhada"
+                alt="Lavagem"
                 loading="lazy"
                 onerror="this.remove()"
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
@@ -335,17 +487,17 @@
               <figcaption
                 class="absolute inset-x-0 bottom-0 p-4 pt-10 bg-gradient-to-t from-black to-transparent font-semibold"
               >
-                Lavagem detalhada
+                Lavagem
               </figcaption>
             </figure>
 
             <figure
-              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex items-center justify-center"
+              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-primaria bg-neutral-900 flex items-center justify-center"
             >
               <i class="bi bi-camera text-neutral-700 text-5xl transition-transform duration-500 ease-out group-hover:scale-125"></i>
               <img
                 src="imgs/trabalhos/5.jpg"
-                alt="Película de proteção"
+                alt="Insulfilm"
                 loading="lazy"
                 onerror="this.remove()"
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
@@ -353,17 +505,17 @@
               <figcaption
                 class="absolute inset-x-0 bottom-0 p-4 pt-10 bg-gradient-to-t from-black to-transparent font-semibold"
               >
-                Película de proteção
+                Insulfilm
               </figcaption>
             </figure>
 
             <figure
-              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex items-center justify-center"
+              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-primaria bg-neutral-900 flex items-center justify-center"
             >
               <i class="bi bi-camera text-neutral-700 text-5xl transition-transform duration-500 ease-out group-hover:scale-125"></i>
               <img
                 src="imgs/trabalhos/6.jpg"
-                alt="Revitalização de faróis"
+                alt="Restauração de faróis"
                 loading="lazy"
                 onerror="this.remove()"
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
@@ -371,12 +523,12 @@
               <figcaption
                 class="absolute inset-x-0 bottom-0 p-4 pt-10 bg-gradient-to-t from-black to-transparent font-semibold"
               >
-                Revitalização de faróis
+                Restauração de faróis
               </figcaption>
             </figure>
 
             <figure
-              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex items-center justify-center"
+              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-primaria bg-neutral-900 flex items-center justify-center"
             >
               <i class="bi bi-camera text-neutral-700 text-5xl transition-transform duration-500 ease-out group-hover:scale-125"></i>
               <img
@@ -394,7 +546,7 @@
             </figure>
 
             <figure
-              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900 flex items-center justify-center"
+              class="group relative shrink-0 w-[295px] aspect-[295/425] mr-4 rounded-lg overflow-hidden border border-primaria bg-neutral-900 flex items-center justify-center"
             >
               <i class="bi bi-camera text-neutral-700 text-5xl transition-transform duration-500 ease-out group-hover:scale-125"></i>
               <img
@@ -419,11 +571,11 @@
         id="diferenciais"
         class="bg-gradient-to-b from-black via-borda/30 to-black text-white py-28 estreito:pb-14 px-6"
       >
-        <div class="text-center pb-14">
-          <h2 class="text-4xl font-semibold js-reveal">
+        <div class="text-center pb-10 sm:pb-14">
+          <h2 class="text-[1.75rem] leading-tight sm:text-4xl font-semibold js-reveal">
             Por que o Berto Studio
           </h2>
-          <p class="text-lg text-neutral-500 max-w-2xl mx-auto pt-4 js-reveal">
+          <p class="text-base sm:text-lg text-neutral-500 max-w-2xl mx-auto pt-4 js-reveal">
             Um estúdio pensado para tratar o seu carro como único.
           </p>
         </div>
@@ -476,16 +628,21 @@
         class="min-h-[80vh] estreito:min-h-0 flex flex-col justify-center items-center text-center text-white px-6 py-28 estreito:pt-10"
       >
         <img
-          src="imgs/logo.png"
+          src="imgs/logo.webp" width="480" height="320"
           alt=""
           class="w-48 sm:w-56 max-w-full mix-blend-screen js-reveal"
         />
-        <h2 class="text-4xl font-semibold pt-6 js-reveal">
+        <h2 class="text-[1.75rem] leading-tight sm:text-4xl font-semibold pt-6 js-reveal">
           Agende seu horário
         </h2>
-        <p class="text-lg text-neutral-500 max-w-xl pt-4 pb-8 js-reveal">
+        <p class="text-base sm:text-lg text-neutral-500 max-w-xl pt-4 pb-6 js-reveal">
           Fale com a gente pelo WhatsApp e receba um orçamento para o seu carro.
         </p>
+        <div class="text-sm sm:text-base text-neutral-300 pb-8 js-reveal">
+          <p class="text-xs tracking-[0.3em] uppercase text-primaria pb-2"><i class="bi bi-clock mr-1"></i>Horários</p>
+          <p>Segunda a sexta: das 8h às 18h</p>
+          <p>Sábado: das 8h às 16h</p>
+        </div>
         <a
           href="https://wa.me/5541996817106?text=Ol%C3%A1%2C%20Berto%20Studio%20Automotivo%21%20Vim%20pelo%20site%20e%20gostaria%20de%20um%20or%C3%A7amento%20para%20o%20meu%20carro.%20Pode%20me%20ajudar%3F" data-whatsapp
           target="_blank"
@@ -499,11 +656,17 @@
 
       <!-- AVALIAÇÕES (carrossel automático; os textos vêm de js/dados.js) -->
       <!-- FIM DA PÁGINA: mapa pequeno + carrossel de avaliações ao lado (no celular, um embaixo do outro) -->
-      <section id="avaliacoes" class="bg-black text-white pt-10 pb-16 px-4 md:px-8">
+      <section id="avaliacoes" class="bg-black text-white pt-10 pb-4 px-4 md:px-8">
         <!-- Computador: linha 1 = título das avaliações; linha 2 = mapa e cards (centralizados entre si);
-             linha 3 = endereço embaixo do mapa. Celular: um embaixo do outro. -->
+             endereço em cima do mapa (linha 1, ao lado do título). Celular: um embaixo do outro. -->
         <div class="grid gap-x-6 gap-y-4 md:grid-cols-[minmax(0,240px)_minmax(0,1fr)] md:items-center">
-          <div id="localizacao" class="md:col-start-1 md:row-start-2 aspect-[16/10] rounded-xl overflow-hidden border border-white/10 js-reveal">
+          <a
+              class="js-rota md:col-start-1 md:row-start-1 text-center text-[9px] tracking-[0.2em] uppercase leading-relaxed text-neutral-500 hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener"
+              ><svg viewBox="0 0 24 24" class="inline-block w-[1.1em] h-[1.1em] align-[-0.2em] mr-1" aria-hidden="true"><clipPath id="pino-maps"><path d="M12 1.5c-4.1 0-7.5 3.3-7.5 7.4 0 5.5 7.5 13.6 7.5 13.6s7.5-8.1 7.5-13.6c0-4.1-3.4-7.4-7.5-7.4z"/></clipPath><g clip-path="url(#pino-maps)"><rect x="0" y="0" width="12" height="9" fill="#1A73E8"/><rect x="12" y="0" width="12" height="9" fill="#EA4335"/><rect x="0" y="9" width="12" height="15" fill="#FBBC04"/><rect x="12" y="9" width="12" height="15" fill="#34A853"/></g><circle cx="12" cy="9" r="2.8" fill="#000"/></svg><span class="js-endereco"></span
+            ></a>
+          <div id="localizacao" class="md:col-start-1 md:row-start-2 aspect-[16/10] rounded-xl overflow-hidden border border-primaria js-reveal">
             <iframe
                 class="js-mapa w-full h-full"
                 title="Localização do Berto Studio Automotivo no Google Maps"
@@ -511,13 +674,7 @@
                 referrerpolicy="no-referrer-when-downgrade"
               ></iframe>
           </div>
-          <a
-              class="js-rota md:col-start-1 md:row-start-3 -mt-2 text-center text-[9px] tracking-[0.2em] uppercase leading-relaxed text-neutral-500 hover:text-white transition-colors"
-              target="_blank"
-              rel="noopener"
-              ><svg viewBox="0 0 24 24" class="inline-block w-[1.1em] h-[1.1em] align-[-0.2em] mr-1" aria-hidden="true"><clipPath id="pino-maps"><path d="M12 1.5c-4.1 0-7.5 3.3-7.5 7.4 0 5.5 7.5 13.6 7.5 13.6s7.5-8.1 7.5-13.6c0-4.1-3.4-7.4-7.5-7.4z"/></clipPath><g clip-path="url(#pino-maps)"><rect x="0" y="0" width="12" height="9" fill="#1A73E8"/><rect x="12" y="0" width="12" height="9" fill="#EA4335"/><rect x="0" y="9" width="12" height="15" fill="#FBBC04"/><rect x="12" y="9" width="12" height="15" fill="#34A853"/></g><circle cx="12" cy="9" r="2.8" fill="#000"/></svg><span class="js-endereco"></span
-            ></a>
-          <h2 class="md:col-start-2 md:row-start-1 text-center md:text-left text-[11px] tracking-[0.3em] uppercase text-neutral-500 pt-4 md:pt-0 js-reveal"><svg viewBox="0 0 48 48" class="inline-block w-[1em] h-[1em] align-[-0.125em]" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Avaliações no Google</h2>
+          <h2 class="md:col-start-2 md:row-start-1 md:self-end text-center md:text-left text-[9px] tracking-[0.2em] uppercase text-neutral-500 pt-4 md:pt-0 js-reveal"><svg viewBox="0 0 48 48" class="inline-block w-[1em] h-[1em] align-[-0.125em]" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Avaliações no Google</h2>
           <div class="md:col-start-2 md:row-start-2 min-w-0 js-trilho overflow-x-auto sem-barra w-full cursor-grab active:cursor-grabbing js-reveal">
             <div class="js-carrossel js-avaliacoes flex w-max py-2"></div>
           </div>
@@ -525,11 +682,21 @@
       </section>
     </main>
 
-    <footer class="bg-black text-white px-6 md:px-16 py-10">
-      <div class="border-t border-borda pt-4 text-center text-xs">
+    <footer class="bg-black text-white px-6 md:px-16 pt-4 pb-8">
+      <div class="border-t-2 border-primaria pt-4 text-center text-xs">
         Berto Studio Automotivo © 2026 — Todos os direitos reservados
       </div>
     </footer>
+
+    <!-- Botão redondo do WhatsApp: fica fixo no canto inferior direito, por cima de tudo -->
+    <a
+      href="https://wa.me/5541996817106" data-whatsapp
+      target="_blank"
+      rel="noopener"
+      aria-label="Chamar no WhatsApp"
+      class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[9999] w-12 h-12 rounded-full bg-[#25D366] hover:bg-[#1EBE5A] border border-[#5CFF9D]/70 shadow-[0_6px_18px_rgba(0,0,0,0.45),0_0_14px_rgba(37,211,102,0.35)] flex items-center justify-center text-white text-2xl transition-[transform,background-color] duration-300 hover:scale-110"
+      ><i class="bi bi-whatsapp" aria-hidden="true"></i
+    ></a>
 
     <script
       src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"
@@ -539,7 +706,7 @@
       src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"
       defer
     ></script>
-    <script src="js/dados.js" defer></script>
-    <script src="js/script.js" defer></script>
+    <script src="js/dados.js?v=2" defer></script>
+    <script src="js/script.js?v=3" defer></script>
   </body>
 </html>

@@ -2,12 +2,24 @@ gsap.registerPlugin(ScrollTrigger);
 // no celular a barra de endereço some/aparece no scroll; sem isso o pin recalcula e pula
 ScrollTrigger.config({ ignoreMobileResize: true });
 
+// Sem zoom: o Safari do iPhone ignora user-scalable=no, então a pinça é barrada aqui
+["gesturestart", "gesturechange"].forEach((t) =>
+  document.addEventListener(t, (e) => e.preventDefault(), { passive: false })
+);
+document.addEventListener(
+  "touchmove",
+  (e) => {
+    if (e.touches.length > 1) e.preventDefault();
+  },
+  { passive: false }
+);
+
 // Avaliações e mapa vêm de js/dados.js (ENDERECO e AVALIACOES)
 const listaAvaliacoes = document.querySelector(".js-avaliacoes");
 (typeof AVALIACOES !== "undefined" ? AVALIACOES : []).forEach((a) => {
   const card = document.createElement("article");
   card.className =
-    "shrink-0 w-44 mr-2.5 rounded-lg border border-white/15 bg-neutral-900 p-2.5 flex flex-col gap-1 select-none";
+    "shrink-0 w-44 mr-2.5 rounded-lg border border-primaria bg-neutral-900 p-2.5 flex flex-col gap-1 select-none";
   card.innerHTML = `
     <div class="flex items-center gap-2">
       <div class="w-6 h-6 shrink-0 rounded-full bg-borda flex items-center justify-center text-[10px] font-semibold js-inicial"></div>
@@ -64,7 +76,9 @@ gsap.matchMedia().add(
   ({ conditions }) => {
     // O arquivo segue o formato da tela (e troca se ela mudar):
     // tela estreita = vídeo 4:3 de 720p a 48 quadros/s; tela larga = vídeo inteiro 1080p
-    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=17" : "imgs/hero.mp4?v=14";
+    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=25" : "imgs/hero.mp4?v=21";
+    // imagem leve do 1º quadro: o carro aparece na hora, antes do vídeo terminar de carregar
+    video.poster = conditions.estreito ? "imgs/hero-mobile-poster.webp" : "imgs/hero-poster.webp";
     if (!video.src.endsWith(arquivo)) video.src = arquivo;
 
     if (conditions.estreito) {
@@ -89,23 +103,65 @@ gsap.matchMedia().add(
       const frases = gsap
         .timeline({ paused: true })
         .to({}, { duration: 3 }, 0)
-        .fromTo(c1, { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0)
         .to(c1, { opacity: 0, y: -30, duration: 0.3 }, 0.6)
         .fromTo(c2, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3 }, 1)
         .to(c2, { opacity: 0, y: -30, duration: 0.3 }, 1.8)
-        .fromTo(c3, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3 }, 2.2)
-        .to(c3, { opacity: 0, y: -30, duration: 0.2 }, 2.8);
+        .fromTo(c3, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3 }, 2.2);
+      // O vídeo do celular é ida e volta (o giro termina e volta por onde veio, sem pular
+      // para o início): pos = onde a câmera está no giro, de 0 a META, nos dois sentidos.
+      const pos = () => {
+        const meta = video.duration / 2, t = video.currentTime;
+        return t <= meta ? t : video.duration - t;
+      };
       const suavizar = () => {
         alvo += (BASE - alvo) * 0.04; // a aceleração vai se dissipando
         atual += (alvo - atual) * 0.12; // e a velocidade segue o alvo sem trancos
         if (Math.abs(video.playbackRate - atual) > 0.01) video.playbackRate = atual;
-        if (video.duration) frases.progress(video.currentTime / video.duration);
+        if (video.duration) frases.progress(pos() / (video.duration / 2));
         quadro = requestAnimationFrame(suavizar);
       };
       addEventListener("scroll", aoRolar, { passive: true });
       suavizar();
 
+      // Arrastar o dedo para os lados no hero gira o carro (o vídeo pausa e segue o dedo);
+      // ao soltar, volta a girar sozinho. pan-y: arrastar na vertical continua rolando a página.
+      const hero = document.querySelector(".js-hero");
+      let arrasto = null;
+      const aoTocar = (e) => {
+        arrasto = { x: e.clientX, y: e.clientY, t: video.currentTime, p: pos(), lateral: false };
+      };
+      const aoMover = (e) => {
+        if (!arrasto || !video.duration) return;
+        const dx = e.clientX - arrasto.x;
+        if (!arrasto.lateral) {
+          if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - arrasto.y)) return;
+          arrasto.lateral = true;
+          video.pause();
+        }
+        // o giro inteiro = arrastar 1,5 tela; dedo para a esquerda avança o giro e para
+        // nas pontas; continua na metade (ida ou volta) em que o vídeo estava
+        const meta = video.duration / 2;
+        const p = Math.min(meta - 0.02, Math.max(0, arrasto.p - (dx / (innerWidth * 1.5)) * meta));
+        video.currentTime = arrasto.t <= meta ? p : video.duration - p;
+      };
+      const aoSoltar = () => {
+        if (arrasto?.lateral) video.play().catch(() => {});
+        arrasto = null;
+      };
+      hero.style.touchAction = "pan-y";
+      hero.addEventListener("pointerdown", aoTocar);
+      hero.addEventListener("pointermove", aoMover);
+      hero.addEventListener("pointerup", aoSoltar);
+      hero.addEventListener("pointercancel", aoSoltar);
+      hero.addEventListener("pointerleave", aoSoltar);
+
       return () => {
+        hero.style.touchAction = "";
+        hero.removeEventListener("pointerdown", aoTocar);
+        hero.removeEventListener("pointermove", aoMover);
+        hero.removeEventListener("pointerup", aoSoltar);
+        hero.removeEventListener("pointercancel", aoSoltar);
+        hero.removeEventListener("pointerleave", aoSoltar);
         removeEventListener("scroll", aoRolar);
         cancelAnimationFrame(quadro);
         frases.kill();
@@ -145,6 +201,9 @@ gsap.matchMedia().add(
 // some de novo ao rolar para cima). Em grade com várias colunas, cada coluna começa um
 // pouco depois da anterior, para os cards da mesma linha surgirem em sequência.
 gsap.utils.toArray(".js-reveal").forEach((el) => {
+  // Já visível ao abrir (ex.: Serviços logo abaixo do hero no celular): fica à mostra, sem
+  // animação; com clamp() o início e o fim viravam 0 e o elemento ficava invisível até rolar.
+  if (el.getBoundingClientRect().top + scrollY < innerHeight * 0.9) return;
   const coluna = () => {
     const pai = el.parentElement;
     const cols = getComputedStyle(pai).gridTemplateColumns.split(" ").filter(Boolean).length || 1;

@@ -5,15 +5,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italiana&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300..700&display=swap');
 
 @theme{
-  --color-primaria: #562AB6; /* roxo do logo (B e "TO") */
+  --color-primaria: #562ab7; /* roxo do logo (B e "TO") */
   --color-secundaria: #111111;
   --font-family-primaria: 'inter', sans-serif;
   --font-family-secundaria: 'Italiana', serif;
   --color-fundo-primario: #1A0B33;
   --color-fundo-secundario: #0D0D0D;
   /* bordas: o mesmo roxo do logo; e o brilho neon delas */
-  --color-borda: #562AB6;
-  --shadow-neon: 0 0 10px rgba(86, 42, 182, 0.5), inset 0 0 8px rgba(86, 42, 182, 0.18);
+  --color-borda: #562ab7;
+  --shadow-neon: 0 0 10px rgba(86, 42, 183, 0.5), inset 0 0 8px rgba(86, 42, 183, 0.18);
 }
 
 /* Botão "Ver serviços": no roxo das bordas e do degradê (--color-borda) */
@@ -30,8 +30,8 @@
   transition: background-color 0.3s, border-color 0.3s;
 }
 .button-primaria:hover {
-  background-color: #6634CC;
-  border-color: #6634CC;
+  background-color: #562ab7;
+  border-color: #562ab7;
 }
 
 .button-secundario {
@@ -63,15 +63,15 @@
 }
 
 .shadow-primaria {
-  box-shadow: 0 4px 10px rgba(86, 42, 182, 0.4), 0 8px 20px rgba(86, 42, 182, 0.2);
+  box-shadow: 0 4px 10px rgba(86, 42, 183, 0.4), 0 8px 20px rgba(86, 42, 183, 0.2);
 }
 
 /* Brilho neon em volta das frases do topo, no mesmo roxo das bordas (--color-borda) */
 .text-shadow {
   text-shadow:
-    0 0 3px rgba(86, 42, 182, 0.45),
-    0 0 10px rgba(86, 42, 182, 0.35),
-    0 0 24px rgba(86, 42, 182, 0.25);
+    0 0 3px rgba(86, 42, 183, 0.45),
+    0 0 10px rgba(86, 42, 183, 0.35),
+    0 0 24px rgba(86, 42, 183, 0.25);
 }
 
 /* A barra inteira */
@@ -87,14 +87,14 @@
 
 /* A própria barra que você arrasta */
 ::-webkit-scrollbar-thumb {
-  background-color: #562AB6; /* Cor da barra */
+  background-color: #562ab7; /* Cor da barra */
   border-radius: 6px;
   border: 3px solid #000000; /* Espaço entre thumb e track */
 }
 
 /* Ao passar o mouse */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #6634CC;
+  background-color: #562ab7;
 }
 
 
@@ -135,7 +135,7 @@ details summary::-webkit-details-marker {
   background: rgba(255, 255, 255, 0.1); /* fundo branco semitransparente */
   backdrop-filter: blur(12px); /* desfoque do que está atrás */
   -webkit-backdrop-filter: blur(12px); /* Safari/iOS */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* borda suave */
+  border: 1px solid #562ab7; /* borda roxa */
   border-radius: 16px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
 }
@@ -149,12 +149,15 @@ nav.componente-vidro.rounded-full {
   height: 36px; /* mesma altura do botão do WhatsApp */
   padding: 0 28px;
   /* transparência com gradiente sutil de luz */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0) 50%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
+  /* luz vindo de cima (metade de cima mais clara) e base levemente mais escura = volume 3D */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.015) 45%,
+      rgba(0, 0, 0, 0.25) 100%
+    ),
+    rgba(4, 2, 8, 0.85);
   /* desfoque; no Chrome/Edge soma a distorção óptica do filtro SVG (#liquid-refraction no HTML).
      Navegadores que não aceitam o url() ficam só com a primeira linha (desfoque). */
   backdrop-filter: blur(2px);
@@ -162,14 +165,53 @@ nav.componente-vidro.rounded-full {
   -webkit-backdrop-filter: blur(2px);
   /* reflexos internos que dão a espessura 3D do vidro */
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0),
-    inset 0 1px 2px rgba(255, 255, 255, 0.45),
-    inset 0 -3px 6px rgba(0, 0, 0, 0),
-    inset 4px 0 8px rgba(255, 255, 255, 0.08),
-    inset -4px 0 8px rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.45); /* borda externa brilhante */
+    0 6px 16px rgba(0, 0, 0, 0.45), /* sombra embaixo: o vidro "flutua" */
+    inset 0 1px 0 rgba(255, 255, 255, 0.1), /* reflexo fino na borda de cima */
+    inset 0 6px 10px -6px rgba(255, 255, 255, 0.12), /* luz entrando pelo topo */
+    inset 0 -6px 10px -6px rgba(0, 0, 0, 0.5), /* sombra interna na base */
+    inset 4px 0 8px -4px rgba(255, 255, 255, 0.06),
+    inset -4px 0 8px -4px rgba(255, 255, 255, 0.06);
+  border: 1px solid #562ab7; /* borda roxa sólida, no tom da logo, sem brilho */
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .liquid-glass:hover {
   transform: scale(1.02);
+}
+
+/* Sem zoom no celular: toque duplo não amplia (a pinça é bloqueada no viewport e no script.js) */
+html {
+  touch-action: manipulation;
+}
+
+/* ===== Cards de serviços: foto em cima, texto embaixo, borda roxa ===== */
+.card-servico {
+  background: #000;
+  border: 1px solid #562ab7;
+  border-radius: 16px;
+  transition: top 0.3s, border-color 0.3s, background-color 0.3s;
+}
+.card-servico:hover {
+  border-color: #7a4fd6; /* um pouco mais claro ao passar o mouse */
+}
+
+/* Ícone: plaquinha roxa translúcida com leve volume (luz em cima), símbolo lilás claro */
+.icone-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* não espremer ao lado do texto */
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  color: #c4b1ff;
+  background: linear-gradient(160deg, rgba(86, 42, 183, 0.45), rgba(40, 18, 90, 0.9));
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(86, 42, 183, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: color 0.3s, background 0.3s;
+}
+.card-servico:hover .icone-3d {
+  color: #fff;
+  background: linear-gradient(160deg, rgba(86, 42, 183, 0.6), rgba(86, 42, 183, 0.3));
 }
