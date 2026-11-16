@@ -19,7 +19,7 @@ const listaAvaliacoes = document.querySelector(".js-avaliacoes");
 (typeof AVALIACOES !== "undefined" ? AVALIACOES : []).forEach((a) => {
   const card = document.createElement("article");
   card.className =
-    "shrink-0 w-44 mr-2.5 rounded-lg border border-primaria bg-neutral-900 p-2.5 flex flex-col gap-1 select-none";
+    "shrink-0 w-44 mr-2.5 rounded-lg border border-white/10 bg-neutral-900 p-2.5 flex flex-col gap-1 select-none";
   card.innerHTML = `
     <div class="flex items-center gap-2">
       <div class="w-6 h-6 shrink-0 rounded-full bg-borda flex items-center justify-center text-[10px] font-semibold js-inicial"></div>
@@ -76,9 +76,9 @@ gsap.matchMedia().add(
   ({ conditions }) => {
     // O arquivo segue o formato da tela (e troca se ela mudar):
     // tela estreita = vídeo 4:3 de 720p a 48 quadros/s; tela larga = vídeo inteiro 1080p
-    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=25" : "imgs/hero.mp4?v=21";
+    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=31" : "imgs/hero.mp4?v=27";
     // imagem leve do 1º quadro: o carro aparece na hora, antes do vídeo terminar de carregar
-    video.poster = conditions.estreito ? "imgs/hero-mobile-poster.webp" : "imgs/hero-poster.webp";
+    video.poster = conditions.estreito ? "imgs/hero-mobile-poster.webp?v=7" : "imgs/hero-poster.webp?v=7";
     if (!video.src.endsWith(arquivo)) video.src = arquivo;
 
     if (conditions.estreito) {
@@ -201,6 +201,8 @@ gsap.matchMedia().add(
 // some de novo ao rolar para cima). Em grade com várias colunas, cada coluna começa um
 // pouco depois da anterior, para os cards da mesma linha surgirem em sequência.
 gsap.utils.toArray(".js-reveal").forEach((el) => {
+  // cards de serviços têm entrada própria (abaixo), só no computador
+  if (el.classList.contains("card-servico")) return;
   // Já visível ao abrir (ex.: Serviços logo abaixo do hero no celular): fica à mostra, sem
   // animação; com clamp() o início e o fim viravam 0 e o elemento ficava invisível até rolar.
   if (el.getBoundingClientRect().top + scrollY < innerHeight * 0.9) return;
@@ -229,6 +231,79 @@ gsap.utils.toArray(".js-reveal").forEach((el) => {
       },
     }
   );
+});
+
+// Celular: pilha dos cards de serviços. Rolando para baixo, os cards grudam no topo (um sobre o
+// outro); rolando para cima, a pilha passa para baixo da tela, invertida (classe .pilha-baixo no CSS).
+// O card que vai sendo coberto encolhe e escurece aos poucos, conforme quanto está coberto.
+gsap.matchMedia().add("(max-width: 767px)", () => {
+  const cards = gsap.utils.toArray(".card-servico");
+  const grade = cards[0]?.parentElement;
+  if (!grade) return;
+  let ultimo = scrollY, baixo = false;
+  // o evento de scroll já chega uma vez por frame; desenha direto
+  const desenha = () => {
+    const dy = scrollY - ultimo;
+    if (Math.abs(dy) > 4) {
+      // o lado da pilha é decidido pela direção com que se chega à seção e fica fixo enquanto
+      // ela está na tela: assim, ao inverter no meio, a pilha se desfaz na ordem contrária
+      // em vez de pular de uma vez para o outro lado
+      const rg = grade.getBoundingClientRect();
+      const fora = rg.bottom < 0 || rg.top > innerHeight;
+      const subindo = dy < 0;
+      if (fora && subindo !== baixo) {
+        baixo = subindo;
+        grade.classList.toggle("pilha-baixo", baixo);
+      }
+      ultimo = scrollY;
+    }
+    const r = cards.map((c) => c.getBoundingClientRect());
+    cards.forEach((c, i) => {
+      const h = c.offsetHeight;
+      let p = 0;
+      if (!baixo && cards[i + 1]) {
+        // coberto pelo próximo, que sobe por cima (origem no topo: o topo não se mexe com a escala)
+        p = (r[i].top + h - r[i + 1].top) / h;
+      } else if (baixo && cards[i - 1]) {
+        // coberto pelo anterior, que desce por cima (origem embaixo: a base não se mexe)
+        p = (r[i - 1].bottom - (r[i].bottom - h)) / h;
+      }
+      p = Math.min(1, Math.max(0, p));
+      c.style.transformOrigin = baixo ? "50% 100%" : "50% 0%";
+      c.style.transform = p ? `scale(${1 - 0.08 * p})` : "";
+      // embaixo escurece menos, para os degraus da pilha continuarem visíveis
+      c.style.filter = p ? `brightness(${1 - (baixo ? 0.3 : 0.55) * p})` : "";
+    });
+  };
+  addEventListener("scroll", desenha, { passive: true });
+  desenha();
+  return () => {
+    removeEventListener("scroll", desenha);
+    grade.classList.remove("pilha-baixo");
+    cards.forEach((c) => (c.style.transform = c.style.filter = c.style.transformOrigin = ""));
+  };
+});
+
+// Cards de serviços: no computador surgem só com opacidade (sem mexer no transform, para o
+// "crescer ao passar o mouse" do CSS funcionar); no celular ficam na pilha, sem entrada.
+// gsap.matchMedia desfaz tudo sozinho quando a tela muda de largura.
+gsap.matchMedia().add("(min-width: 768px)", () => {
+  gsap.utils.toArray(".card-servico").forEach((el, i) => {
+    gsap.fromTo(el, { opacity: 0 }, {
+      opacity: 1,
+      ease: "none",
+      scrollTrigger: { trigger: el, start: `top ${98 - (i % 5) * 4}%`, end: `top ${75 - (i % 5) * 4}%`, scrub: 0.6 },
+    });
+  });
+});
+
+// Mudou a largura da tela (girou o celular, redimensionou a janela): recalcula as posições
+// das animações presas ao scroll, para nada ficar invisível com posição antiga
+let larguraTela = innerWidth;
+addEventListener("resize", () => {
+  if (innerWidth === larguraTela) return;
+  larguraTela = innerWidth;
+  ScrollTrigger.refresh();
 });
 
 // Carrosséis (Trabalhos e Avaliações): passam sozinhos e também aceitam rolagem manual

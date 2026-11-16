@@ -185,13 +185,62 @@ html {
 
 /* ===== Cards de serviços: foto em cima, texto embaixo, borda roxa ===== */
 .card-servico {
-  background: #000;
-  border: 1px solid #562ab7;
+  /* leve relevo 3D: luz vindo de cima (topo um pouco mais claro), borda de cima brilhando,
+     sombra interna embaixo e sombra projetada no fundo */
+  background: linear-gradient(180deg, #16141a 0%, #0a090c 55%, #060508 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.6),
+    0 2px 0 rgba(255, 255, 255, 0.03),
+    0 14px 28px -10px rgba(0, 0, 0, 0.9),
+    0 4px 10px -4px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1); /* borda clean: cinza-claro bem discreto */
   border-radius: 16px;
-  transition: top 0.3s, border-color 0.3s, background-color 0.3s;
+  transition: top 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+/* computador: card sobe um pouco ao passar o mouse */
+@media (min-width: 768px) {
+  .card-servico {
+    position: relative;
+    top: 0;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+  }
+  .card-servico:hover {
+    top: 0;
+    transform: scale(1.06); /* o card cresce junto com a imagem */
+    z-index: 2;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.6),
+      0 22px 36px -12px rgba(0, 0, 0, 0.95),
+      0 6px 14px -4px rgba(0, 0, 0, 0.85);
+  }
+}
+/* celular: os cards grudam no topo e o próximo passa por cima (pilha conforme rola);
+   --i (no HTML) desloca cada um alguns px para as bordas de cima ficarem à mostra */
+@media (max-width: 767px) {
+  .card-servico {
+    position: sticky;
+    top: calc(6rem + var(--i, 0) * 10px);
+    z-index: calc(1 + var(--i, 0));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.6),
+      0 -12px 28px rgba(0, 0, 0, 0.7);
+  }
+  /* rolando para cima: pilha embaixo, invertida (o card de cima fica por cima) */
+  .pilha-baixo .card-servico {
+    top: auto;
+    bottom: calc(1rem + (8 - var(--i, 0)) * 16px); /* degraus maiores: a pilha aparece embaixo */
+    border-color: rgba(255, 255, 255, 0.22);
+    z-index: calc(20 - var(--i, 0));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 12px 28px rgba(0, 0, 0, 0.7);
+  }
 }
 .card-servico:hover {
-  border-color: #7a4fd6; /* um pouco mais claro ao passar o mouse */
+  border-color: #562ab7; /* roxo só ao passar o mouse */
 }
 
 /* Ícone: plaquinha roxa translúcida com leve volume (luz em cima), símbolo lilás claro */
