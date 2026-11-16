@@ -62,9 +62,9 @@ const [c1, c2, c3] = document.querySelectorAll(".js-caption");
 gsap.matchMedia().add(
   { estreito: "(max-aspect-ratio: 4/3)", largo: "(min-aspect-ratio: 4/3)" },
   ({ conditions }) => {
-    // O arquivo segue o formato da tela (e troca se ela mudar): tela larga = vídeo inteiro
-    // 1080p em tela cheia; tela estreita = vídeo 4:3 de 720p a 48 quadros/s (8,4 MB).
-    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=7" : "imgs/hero.mp4?v=4";
+    // O arquivo segue o formato da tela (e troca se ela mudar):
+    // tela estreita = vídeo 4:3 de 720p a 48 quadros/s; tela larga = vídeo inteiro 1080p
+    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=17" : "imgs/hero.mp4?v=14";
     if (!video.src.endsWith(arquivo)) video.src = arquivo;
 
     if (conditions.estreito) {
