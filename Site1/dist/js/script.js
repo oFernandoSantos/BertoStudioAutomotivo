@@ -45,13 +45,15 @@ if (typeof ENDERECO !== "undefined") {
   const busca = encodeURIComponent(ENDERECO);
   document.querySelector(".js-mapa").src = `https://www.google.com/maps?q=${busca}&output=embed`;
   document.querySelector(".js-rota").href = `https://www.google.com/maps/search/?api=1&query=${busca}`;
-  // endereço em 2 linhas fixas (rua e número / bairro e cidade), sem quebrar no meio
+  // endereço dividido em rua e número / bairro e cidade, sem quebrar no meio
   const partes = ENDERECO.split(" - ");
   const linhas = partes.length >= 3 ? [partes.slice(0, 2).join(" - "), partes.slice(2).join(" - ")] : [ENDERECO];
   const alvoEndereco = document.querySelector(".js-endereco");
+  // celular: tudo numa linha (com " - " entre as partes); computador: 2 linhas em cima do mapa
   linhas.forEach((texto, i) => {
+    if (i) alvoEndereco.append(Object.assign(document.createElement("span"), { className: "md:hidden", textContent: " - " }));
     const linha = document.createElement("span");
-    linha.className = i ? "block whitespace-nowrap" : "whitespace-nowrap";
+    linha.className = i ? "md:block whitespace-nowrap" : "whitespace-nowrap";
     linha.textContent = texto;
     alvoEndereco.append(linha);
   });
@@ -76,9 +78,9 @@ gsap.matchMedia().add(
   ({ conditions }) => {
     // O arquivo segue o formato da tela (e troca se ela mudar):
     // tela estreita = vídeo 4:3 de 720p a 48 quadros/s; tela larga = vídeo inteiro 1080p
-    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=31" : "imgs/hero.mp4?v=27";
+    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=33" : "imgs/hero.mp4?v=29";
     // imagem leve do 1º quadro: o carro aparece na hora, antes do vídeo terminar de carregar
-    video.poster = conditions.estreito ? "imgs/hero-mobile-poster.webp?v=7" : "imgs/hero-poster.webp?v=7";
+    video.poster = conditions.estreito ? "imgs/hero-mobile-poster.webp?v=9" : "imgs/hero-poster.webp?v=9";
     if (!video.src.endsWith(arquivo)) video.src = arquivo;
 
     if (conditions.estreito) {
@@ -233,54 +235,122 @@ gsap.utils.toArray(".js-reveal").forEach((el) => {
   );
 });
 
-// Celular: pilha dos cards de serviços. Rolando para baixo, os cards grudam no topo (um sobre o
-// outro); rolando para cima, a pilha passa para baixo da tela, invertida (classe .pilha-baixo no CSS).
-// O card que vai sendo coberto encolhe e escurece aos poucos, conforme quanto está coberto.
+// Celular: cards de serviços.
+// 1º acesso do dia: rolando, os cards grudam no topo e empilham (o coberto encolhe e escurece).
+// Quando o último card empilha, a pilha vira um "baralho": fica parada e mostra um card por vez;
+// tocar passa para o próximo. Nos outros acessos do mesmo dia já abre direto no baralho.
 gsap.matchMedia().add("(max-width: 767px)", () => {
   const cards = gsap.utils.toArray(".card-servico");
   const grade = cards[0]?.parentElement;
   if (!grade) return;
-  let ultimo = scrollY, baixo = false;
-  // o evento de scroll já chega uma vez por frame; desenha direto
-  const desenha = () => {
-    const dy = scrollY - ultimo;
-    if (Math.abs(dy) > 4) {
-      // o lado da pilha é decidido pela direção com que se chega à seção e fica fixo enquanto
-      // ela está na tela: assim, ao inverter no meio, a pilha se desfaz na ordem contrária
-      // em vez de pular de uma vez para o outro lado
-      const rg = grade.getBoundingClientRect();
-      const fora = rg.bottom < 0 || rg.top > innerHeight;
-      const subindo = dy < 0;
-      if (fora && subindo !== baixo) {
-        baixo = subindo;
-        grade.classList.toggle("pilha-baixo", baixo);
-      }
-      ultimo = scrollY;
-    }
+  const N = cards.length;
+  const hoje = new Date().toLocaleDateString("sv-SE"); // data local (aaaa-mm-dd)
+  let viuHoje = false;
+  try { viuHoje = localStorage.getItem("pilhaServicos") === hoje; } catch {}
+
+  // ---- baralho: um card por vez, os de trás aparecem como degraus em cima ----
+  const DEGRAU = 16; // quanto de cada card de trás aparece em cima da pilha (px)
+  let frente = 0, aviso, animando = false;
+  const desenhaBaralho = (dur = 0.45) => {
+    cards.forEach((c, i) => {
+      const k = (i - frente + N) % N; // 0 = card da frente
+      const kk = Math.min(k, 5);
+      c.style.zIndex = String(N - k);
+      c.setAttribute("aria-hidden", k ? "true" : "false");
+      gsap.to(c, {
+        top: (N > 5 ? 5 : N - 1) * DEGRAU - kk * DEGRAU,
+        scale: 1 - kk * 0.025,
+        filter: `brightness(${1 - kk * 0.06})`,
+        opacity: k > 5 ? 0 : 1,
+        duration: dur,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    });
+    aviso.textContent = `${frente + 1} / ${N} · toque para ver o próximo`;
+  };
+  // toque: o card da frente pula, vira para o lado e cai no fundo da pilha
+  // auto = troca sozinha (mais lenta e com pulo menor, para ficar suave)
+  let ultimoToque = 0;
+  const proximo = (auto) => {
+    if (animando) return;
+    if (auto !== true) ultimoToque = Date.now();
+    animando = true;
+    const c = cards[frente];
+    const lento = auto === true ? 1.8 : 1;
+    gsap
+      .timeline({ onComplete: () => (animando = false) })
+      .to(c, { y: auto === true ? -60 : -90, x: auto === true ? 20 : 30, rotation: auto === true ? 5 : 8, duration: 0.25 * lento, ease: "power2.out" })
+      .call(() => {
+        frente = (frente + 1) % N;
+        desenhaBaralho(0.5 * lento);
+      })
+      .to(c, { y: 0, x: 0, rotation: 0, duration: 0.5 * lento, ease: auto === true ? "power2.out" : "back.out(1.6)" });
+  };
+  // sem toque: troca sozinha a cada 3,5 s, só com o baralho na tela; depois de um toque espera 6 s
+  let relogio;
+  const autoTroca = () => {
+    const r = grade.getBoundingClientRect();
+    const naTela = r.bottom > 0 && r.top < innerHeight;
+    if (naTela && document.visibilityState === "visible" && Date.now() - ultimoToque > 6000) proximo(true);
+  };
+  const viraBaralho = () => {
+    const topoAntes = grade.getBoundingClientRect().top;
+    grade.classList.add("baralho");
+    aviso = document.createElement("p");
+    aviso.className = "js-aviso-baralho text-center text-xs text-neutral-500 pt-3";
+    grade.after(aviso);
+    cards.forEach((c) => {
+      c.style.transform = c.style.filter = "";
+      gsap.set(c, { transformOrigin: "50% 0%" });
+      c.addEventListener("click", proximo);
+    });
+    grade.style.height = `${Math.max(...cards.map((c) => c.offsetHeight)) + (N > 5 ? 5 : N - 1) * DEGRAU}px`;
+    desenhaBaralho(0);
+    relogio = setInterval(autoTroca, 3500);
+    // mantém o baralho no lugar da tela onde a pilha estava (a página encurta muito)
+    if (topoAntes < 0) scrollTo({ top: grade.getBoundingClientRect().top + scrollY - 96, behavior: "instant" });
+    try { localStorage.setItem("pilhaServicos", hoje); } catch {}
+    // recalcula as animações das seções de baixo (a página encurtou); fora deste callback do
+    // matchMedia, senão o refresh desfaz o próprio callback
+    setTimeout(() => ScrollTrigger.refresh(), 0);
+  };
+
+  // ---- pilha presa ao scroll (só no 1º acesso do dia) ----
+  const desenhaPilha = () => {
+    if (grade.classList.contains("baralho")) return;
     const r = cards.map((c) => c.getBoundingClientRect());
     cards.forEach((c, i) => {
       const h = c.offsetHeight;
-      let p = 0;
-      if (!baixo && cards[i + 1]) {
-        // coberto pelo próximo, que sobe por cima (origem no topo: o topo não se mexe com a escala)
-        p = (r[i].top + h - r[i + 1].top) / h;
-      } else if (baixo && cards[i - 1]) {
-        // coberto pelo anterior, que desce por cima (origem embaixo: a base não se mexe)
-        p = (r[i - 1].bottom - (r[i].bottom - h)) / h;
-      }
-      p = Math.min(1, Math.max(0, p));
-      c.style.transformOrigin = baixo ? "50% 100%" : "50% 0%";
+      const p = cards[i + 1] ? Math.min(1, Math.max(0, (r[i].top + h - r[i + 1].top) / h)) : 0;
+      c.style.transformOrigin = "50% 0%";
       c.style.transform = p ? `scale(${1 - 0.08 * p})` : "";
-      // embaixo escurece menos, para os degraus da pilha continuarem visíveis
-      c.style.filter = p ? `brightness(${1 - (baixo ? 0.3 : 0.55) * p})` : "";
+      c.style.filter = p ? `brightness(${1 - 0.3 * p})` : "";
     });
+    // o último card grudou sobre a pilha: vira baralho
+    const ultimo = cards[N - 1];
+    if (r[N - 1].top <= parseFloat(getComputedStyle(ultimo).top) + 1) {
+      removeEventListener("scroll", desenhaPilha);
+      viraBaralho();
+    }
   };
-  addEventListener("scroll", desenha, { passive: true });
-  desenha();
+  if (viuHoje) viraBaralho();
+  else {
+    addEventListener("scroll", desenhaPilha, { passive: true });
+    desenhaPilha();
+  }
   return () => {
-    removeEventListener("scroll", desenha);
-    grade.classList.remove("pilha-baixo");
-    cards.forEach((c) => (c.style.transform = c.style.filter = c.style.transformOrigin = ""));
+    clearInterval(relogio);
+    removeEventListener("scroll", desenhaPilha);
+    grade.classList.remove("baralho");
+    grade.style.height = "";
+    document.querySelector(".js-aviso-baralho")?.remove();
+    cards.forEach((c) => {
+      c.removeEventListener("click", proximo);
+      c.removeAttribute("aria-hidden");
+      gsap.killTweensOf(c);
+      gsap.set(c, { clearProps: "transform,filter,top,opacity,zIndex,transformOrigin" });
+    });
   };
 });
 

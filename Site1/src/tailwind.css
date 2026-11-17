@@ -2,7 +2,6 @@
 
 /* estreito: = tela mais estreita que 4:3 (vídeo para de cortar as laterais) */
 @custom-variant estreito (@media (max-aspect-ratio: 4/3));
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italiana&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300..700&display=swap');
 
 @theme{
   --color-primaria: #562ab7; /* roxo do logo (B e "TO") */
@@ -14,6 +13,15 @@
   /* bordas: o mesmo roxo do logo; e o brilho neon delas */
   --color-borda: #562ab7;
   --shadow-neon: 0 0 10px rgba(86, 42, 183, 0.5), inset 0 0 8px rgba(86, 42, 183, 0.18);
+  /* cores em hex (o padrão do Tailwind usa oklch, que Chrome 109/Firefox 115 do Windows 7 não leem) */
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-900: #171717;
+  --color-yellow-400: #fdc700;
 }
 
 /* Botão "Ver serviços": no roxo das bordas e do degradê (--color-borda) */
@@ -69,9 +77,10 @@
 /* Brilho neon em volta das frases do topo, no mesmo roxo das bordas (--color-borda) */
 .text-shadow {
   text-shadow:
-    0 0 3px rgba(86, 42, 183, 0.45),
-    0 0 10px rgba(86, 42, 183, 0.35),
-    0 0 24px rgba(86, 42, 183, 0.25);
+    0 0 2px rgba(86, 42, 183, 0.9),
+    0 0 8px rgba(86, 42, 183, 0.6),
+    0 0 18px rgba(86, 42, 183, 0.4),
+    0 0 32px rgba(86, 42, 183, 0.25);
 }
 
 /* A barra inteira */
@@ -221,22 +230,23 @@ html {
 @media (max-width: 767px) {
   .card-servico {
     position: sticky;
-    top: calc(6rem + var(--i, 0) * 10px);
+    top: calc(6rem + var(--i, 0) * 16px);
     z-index: calc(1 + var(--i, 0));
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.14),
       inset 0 -2px 6px rgba(0, 0, 0, 0.6),
       0 -12px 28px rgba(0, 0, 0, 0.7);
   }
-  /* rolando para cima: pilha embaixo, invertida (o card de cima fica por cima) */
-  .pilha-baixo .card-servico {
-    top: auto;
-    bottom: calc(1rem + (8 - var(--i, 0)) * 16px); /* degraus maiores: a pilha aparece embaixo */
-    border-color: rgba(255, 255, 255, 0.22);
-    z-index: calc(20 - var(--i, 0));
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      0 12px 28px rgba(0, 0, 0, 0.7);
+  /* baralho: todos os cards no mesmo lugar, um por vez (posições definidas no script.js) */
+  .baralho {
+    position: relative;
+  }
+  .baralho .card-servico {
+    position: absolute;
+    left: 0;
+    right: 0;
+    cursor: pointer; /* posição e animação do toque: GSAP no script.js */
+    transition: none;
   }
 }
 .card-servico:hover {
@@ -264,3 +274,141 @@ html {
   color: #fff;
   background: linear-gradient(160deg, rgba(86, 42, 183, 0.6), rgba(86, 42, 183, 0.3));
 }
+
+/* Títulos das seções: MAIÚSCULO, mesma fonte das frases do topo (Inter semi-negrito) */
+.titulo-script {
+  font-family: Inter, sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: clamp(1.35rem, 5.4vw, 2.25rem);
+  line-height: 1.25;
+}
+
+/* Animações leves: só transform e opacity (a placa de vídeo faz sozinha, sem redesenhar a página),
+   para rodar liso também em PCs antigos */
+
+/* "Role para ver": texto respira e a setinha desce */
+.role-ver {
+  animation: role-respira 2.4s ease-in-out infinite;
+}
+.role-ver .bi-chevron-down {
+  display: inline-block;
+  animation: role-seta 1.6s ease-in-out infinite;
+}
+@keyframes role-respira {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@keyframes role-seta {
+  0%, 100% { transform: translateY(-2px); opacity: 0.6; }
+  50% { transform: translateY(5px); opacity: 1; }
+}
+
+/* Botão redondo flutuante do WhatsApp: vibra como celular tocando a cada 4 s e solta uma onda verde */
+.botao-vibra {
+  animation: botao-vibra 4s ease-in-out infinite;
+}
+.botao-vibra::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgba(37, 211, 102, 0.7);
+  opacity: 0;
+  animation: botao-onda 4s ease-out infinite;
+  pointer-events: none;
+}
+.botao-vibra:hover {
+  animation-play-state: paused;
+}
+@keyframes botao-vibra {
+  0%, 12%, 100% { transform: rotate(0) scale(1); }
+  2% { transform: rotate(-12deg) scale(1.08); }
+  4% { transform: rotate(10deg) scale(1.08); }
+  6% { transform: rotate(-10deg) scale(1.08); }
+  8% { transform: rotate(8deg) scale(1.06); }
+  10% { transform: rotate(-4deg) scale(1.03); }
+}
+@keyframes botao-onda {
+  0% { transform: scale(1); opacity: 0.8; }
+  30%, 100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Botões de WhatsApp (contato e topo): pulso, anel que se espalha, reflexo de luz e ícone balançando */
+.botao-chamativo {
+  position: relative;
+  overflow: visible;
+  isolation: isolate;
+  animation: botao-pulso 2.4s ease-in-out infinite;
+}
+/* anel verde que cresce e some */
+.botao-chamativo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  border-radius: inherit;
+  box-shadow: 0 0 18px rgba(37, 211, 102, 0.55);
+  opacity: 0;
+  animation: botao-anel 2.4s ease-out infinite;
+  pointer-events: none;
+}
+/* reflexo de luz passando (preso ao formato do botão) */
+.botao-chamativo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%) no-repeat;
+  background-size: 250% 100%;
+  animation: botao-reflexo 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.botao-chamativo .bi-whatsapp {
+  display: inline-block;
+  animation: botao-icone 3.2s ease-in-out infinite;
+}
+.botao-chamativo:hover {
+  animation-play-state: paused;
+  transform: scale(1.03);
+}
+@keyframes botao-pulso {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+@keyframes botao-anel {
+  0% { transform: scale(1); opacity: 0.9; }
+  60%, 100% { transform: scale(1.12, 1.35); opacity: 0; }
+}
+@keyframes botao-reflexo {
+  0%, 55% { background-position: 130% 0; }
+  85%, 100% { background-position: -30% 0; }
+}
+@keyframes botao-icone {
+  0%, 70%, 100% { transform: rotate(0); }
+  75% { transform: rotate(-14deg); }
+  80% { transform: rotate(12deg); }
+  85% { transform: rotate(-8deg); }
+  90% { transform: rotate(0); }
+}
+/* versão do botão do topo: pulso médio */
+.botao-chamativo.leve {
+  animation: botao-pulso-leve 2.6s ease-in-out infinite;
+}
+.botao-chamativo.leve::before {
+  animation-duration: 2.6s;
+}
+.botao-chamativo.leve::after {
+  animation-duration: 3s;
+}
+@keyframes botao-pulso-leve {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .botao-chamativo, .botao-chamativo::before, .botao-chamativo::after, .botao-chamativo .bi-whatsapp,
+  .role-ver, .role-ver .bi-chevron-down, .botao-vibra, .botao-vibra::before { animation: none; }
+}
+

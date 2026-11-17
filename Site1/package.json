@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./dist/css/styles.css --watch",
-    "build": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./dist/css/styles.css",
+    "build": "npx @tailwindcss/cli -i ./src/tailwind.css -o ./dist/css/styles.css && node compat.mjs",
     "serve": "npx serve dist"
   },
   "devDependencies": {
