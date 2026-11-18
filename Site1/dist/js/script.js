@@ -264,9 +264,10 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   try { viuHoje = localStorage.getItem("pilhaServicos") === hoje; } catch {}
 
   // ---- baralho: um card por vez, os de trás aparecem como degraus em cima ----
-  // modo "fixo": 1º acesso, depois de empilhar — a pilha fica grudada no topo da tela por todo
-  //   o trecho da seção (subindo ou descendo), sem mudar a altura da página.
-  // modo "compacto": cards um sobre o outro num bloco baixo (acessos seguintes do mesmo dia).
+  // modo "fixo": 1º acesso, logo depois de empilhar — a pilha fica grudada no topo da tela,
+  //   sem mudar a altura da página enquanto o dedo rola.
+  // modo "compacto": cards um sobre o outro num bloco baixo (quando a rolagem para, ou nos
+  //   acessos seguintes do mesmo dia).
   let pilhaTopo = 96; // onde a última carta gruda na pilha (px do topo da tela)
   const DEGRAU = 16; // quanto de cada card de trás aparece em cima da pilha (px)
   const VIS = Math.min(N - 1, 5); // quantos cards de trás aparecem
@@ -329,6 +330,40 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     try { localStorage.setItem("pilhaServicos", hoje); } catch {}
   };
   const alturaCompacta = () => `${Math.max(...cards.map((c) => c.offsetHeight)) + VIS * DEGRAU}px`;
+  // Depois de empilhar, a seção ainda tem a altura da pilha montando (longa). Quando a pessoa
+  // para de rolar (dedo fora da tela e sem embalo), ela encolhe para o tamanho do baralho e a
+  // rolagem é compensada — parado, o Safari do iPhone respeita o ajuste e nada pula.
+  let dedoNaTela = false, esperaParar;
+  const toque = (e) => (dedoNaTela = e.type === "touchstart");
+  addEventListener("touchstart", toque, { passive: true });
+  addEventListener("touchend", toque, { passive: true });
+  addEventListener("touchcancel", toque, { passive: true });
+  const compactaQuandoParar = () => {
+    clearTimeout(esperaParar);
+    esperaParar = setTimeout(() => (dedoNaTela ? compactaQuandoParar() : compacta()), 250);
+  };
+  const compacta = () => {
+    if (modo !== "fixo") return;
+    removeEventListener("scroll", compactaQuandoParar);
+    const html = document.documentElement;
+    html.style.overflowAnchor = "none"; // a compensação é feita aqui, não pelo navegador
+    const rg = grade.getBoundingClientRect();
+    const pilhaNaTela = rg.bottom > 0 && rg.top < innerHeight;
+    // segura na tela o card da frente (se a pilha está à vista) ou o que vem depois da seção
+    const ref = () => (pilhaNaTela ? cards[frente].getBoundingClientRect().top : grade.getBoundingClientRect().bottom);
+    const antes = ref();
+    modo = "compacto";
+    cards.forEach((c) => (c.style.marginTop = ""));
+    grade.classList.add("baralho");
+    grade.style.height = alturaCompacta();
+    grade.after(aviso);
+    aviso.style.position = aviso.style.top = "";
+    desenhaBaralho(0);
+    gsap.ticker.tick(); // aplica as posições já, para medir certo
+    scrollBy({ top: ref() - antes, behavior: "instant" });
+    html.style.overflowAnchor = "";
+    setTimeout(() => ScrollTrigger.refresh(), 0); // seções de baixo mudaram de lugar
+  };
   // ---- pilha presa ao scroll (só no 1º acesso do dia) ----
   // o encolher/escurecer não salta junto com cada movimento do dedo: segue o scroll com um
   // pequeno atraso suave, e cada card vira uma camada própria da placa de vídeo
@@ -364,6 +399,8 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
         top: `${pilhaTopo + Math.max(...cards.map((c) => c.offsetHeight)) + 8}px`,
       });
       desenhaBaralho(0.35);
+      addEventListener("scroll", compactaQuandoParar, { passive: true });
+      compactaQuandoParar();
     }
   };
   if (viuHoje) {
@@ -379,6 +416,9 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   }
   return () => {
     clearInterval(relogio);
+    clearTimeout(esperaParar);
+    removeEventListener("scroll", compactaQuandoParar);
+    ["touchstart", "touchend", "touchcancel"].forEach((t) => removeEventListener(t, toque));
     removeEventListener("scroll", desenhaPilha);
     grade.classList.remove("baralho");
     grade.style.height = "";
