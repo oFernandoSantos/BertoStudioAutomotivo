@@ -237,6 +237,16 @@ html {
       inset 0 -2px 6px rgba(0, 0, 0, 0.6),
       0 -12px 28px rgba(0, 0, 0, 0.7);
   }
+  /* camada preta que escurece os cards cobertos (--sombra vem do script; leve de animar) */
+  .card-servico::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #000;
+    opacity: var(--sombra, 0);
+    pointer-events: none;
+  }
   /* baralho: todos os cards no mesmo lugar, um por vez (posições definidas no script.js) */
   .baralho {
     position: relative;
@@ -247,16 +257,6 @@ html {
     right: 0;
     cursor: pointer; /* posição e animação do toque: GSAP no script.js */
     transition: none;
-  }
-  /* camada preta que escurece os cards de trás (GSAP muda --sombra; opacity é leve de animar) */
-  .baralho .card-servico::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: #000;
-    opacity: var(--sombra, 0);
-    pointer-events: none;
   }
 }
 .card-servico:hover {
