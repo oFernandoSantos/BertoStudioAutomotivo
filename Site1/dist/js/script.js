@@ -92,9 +92,10 @@ gsap.matchMedia().add(
   ({ conditions }) => {
     // O arquivo segue o formato da tela (e troca se ela mudar):
     // tela estreita = vídeo 4:3 de 720p a 48 quadros/s; tela larga = vídeo inteiro 1080p
-    const arquivo = conditions.estreito ? "imgs/hero-mobile.mp4?v=33" : "imgs/hero.mp4?v=29";
+    // endereços dos vídeos e capas ficam no próprio <video> (data-*), no index.html
+    const arquivo = conditions.estreito ? video.dataset.celular : video.dataset.computador;
     // imagem leve do 1º quadro: o carro aparece na hora, antes do vídeo terminar de carregar
-    video.poster = conditions.estreito ? "imgs/hero-mobile-poster.webp?v=9" : "imgs/hero-poster.webp?v=9";
+    video.poster = conditions.estreito ? video.dataset.capaCelular : video.dataset.capaComputador;
     if (!video.src.endsWith(arquivo)) video.src = arquivo;
 
     if (conditions.estreito) {
@@ -263,12 +264,10 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   try { viuHoje = localStorage.getItem("pilhaServicos") === hoje; } catch {}
 
   // ---- baralho: um card por vez, os de trás aparecem como degraus em cima ----
-  // modo "fixo": 1º acesso, logo depois de empilhar — os cards continuam grudados no topo da tela
-  //   (sticky), sem mudar a altura da página: nada pula, nem com o embalo do dedo.
-  // modo "compacto": cards um sobre o outro num bloco baixo (acessos seguintes do dia, ou quando
-  //   a pessoa volta a subir a página depois de empilhar).
+  // modo "fixo": 1º acesso, depois de empilhar — a pilha fica grudada no topo da tela por todo
+  //   o trecho da seção (subindo ou descendo), sem mudar a altura da página.
+  // modo "compacto": cards um sobre o outro num bloco baixo (acessos seguintes do mesmo dia).
   let pilhaTopo = 96; // onde a última carta gruda na pilha (px do topo da tela)
-  let pilhaBase = 96; // onde a primeira carta gruda
   const DEGRAU = 16; // quanto de cada card de trás aparece em cima da pilha (px)
   const VIS = Math.min(N - 1, 5); // quantos cards de trás aparecem
   let modo = null, frente = 0, aviso, animando = false;
@@ -330,43 +329,6 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     try { localStorage.setItem("pilhaServicos", hoje); } catch {}
   };
   const alturaCompacta = () => `${Math.max(...cards.map((c) => c.offsetHeight)) + VIS * DEGRAU}px`;
-  // Modo fixo + a pessoa sobe a página: a pilha volta a ser a pilha do scroll (desempilha ao subir,
-  // empilha de novo ao descer). A altura da página nunca muda durante a visita — no iPhone, mexer na
-  // altura com o dedo ainda rolando fazia o Safari ignorar o ajuste e jogar a tela para o fim.
-  const voltaPilha = () => {
-    modo = null;
-    clearInterval(relogio);
-    if (aviso) aviso.style.visibility = "hidden";
-    cards.forEach((c, i) => {
-      gsap.killTweensOf(c, "top,opacity,x,y,rotation");
-      c.style.zIndex = String(i + 1);
-      c.removeAttribute("aria-hidden");
-      // volta para o degrau da pilha (o mesmo top do CSS) e depois devolve o controle ao CSS
-      gsap.to(c, {
-        top: pilhaBase + i * DEGRAU,
-        x: 0,
-        y: 0,
-        rotation: 0,
-        opacity: 1,
-        duration: 0.3,
-        ease: "sine.out",
-        onComplete: () => gsap.set(c, { clearProps: "top,zIndex" }),
-      });
-    });
-    addEventListener("scroll", desenhaPilha, { passive: true });
-    desenhaPilha();
-  };
-  // no modo fixo, ao subir mais que um pouquinho, a pilha volta a desempilhar com o scroll
-  let maiorY = scrollY;
-  const vigiaSubida = () => {
-    if (modo !== "fixo") return removeEventListener("scroll", vigiaSubida);
-    maiorY = Math.max(maiorY, scrollY);
-    if (scrollY < maiorY - 24) {
-      removeEventListener("scroll", vigiaSubida);
-      voltaPilha();
-    }
-  };
-
   // ---- pilha presa ao scroll (só no 1º acesso do dia) ----
   // o encolher/escurecer não salta junto com cada movimento do dedo: segue o scroll com um
   // pequeno atraso suave, e cada card vira uma camada própria da placa de vídeo
@@ -381,16 +343,27 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
       gsap.to(c, { scale: 1 - 0.06 * p, "--sombra": 0.3 * p, duration: 0.45, ease: "power3.out", overwrite: "auto" });
     });
     // o último card grudou sobre a pilha: vira baralho ali mesmo, sem mexer na página
-    pilhaBase = parseFloat(getComputedStyle(cards[0]).top);
     pilhaTopo = parseFloat(getComputedStyle(cards[N - 1]).top);
     if (r[N - 1].top <= pilhaTopo + 1) {
       removeEventListener("scroll", desenhaPilha);
       modo = "fixo";
       frente = N - 1; // o último card (que acabou de cobrir a pilha) é o da frente
+      // trava a altura da seção e põe todos os cards no topo dela (um sobre o outro, por margem
+      // negativa): a pilha continua grudada na tela por todo o trecho da seção, subindo ou
+      // descendo, e a altura da página não muda (no iPhone, mudar a altura rolando fazia pular)
+      grade.style.height = `${grade.offsetHeight}px`;
+      const gap = parseFloat(getComputedStyle(grade).rowGap) || 0;
+      cards.forEach((c, i) => {
+        if (i) c.style.marginTop = `${-(cards[i - 1].offsetHeight + gap)}px`;
+      });
       iniciaBaralho();
+      // o aviso "1 / 9 · toque..." vai junto da pilha (grudado logo abaixo do card da frente)
+      grade.append(aviso);
+      Object.assign(aviso.style, {
+        position: "sticky",
+        top: `${pilhaTopo + Math.max(...cards.map((c) => c.offsetHeight)) + 8}px`,
+      });
       desenhaBaralho(0.35);
-      maiorY = scrollY;
-      addEventListener("scroll", vigiaSubida, { passive: true });
     }
   };
   if (viuHoje) {
@@ -407,10 +380,11 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   return () => {
     clearInterval(relogio);
     removeEventListener("scroll", desenhaPilha);
-    removeEventListener("scroll", vigiaSubida);
     grade.classList.remove("baralho");
     grade.style.height = "";
+    cards.forEach((c) => (c.style.marginTop = ""));
     document.querySelector(".js-aviso-baralho")?.remove();
+    aviso = null;
     cards.forEach((c) => {
       c.removeEventListener("click", proximo);
       c.removeAttribute("aria-hidden");
