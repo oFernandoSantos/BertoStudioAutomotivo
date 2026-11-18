@@ -268,6 +268,7 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   // modo "compacto": cards um sobre o outro num bloco baixo (acessos seguintes do dia, ou quando
   //   a pessoa volta a subir a página depois de empilhar).
   let pilhaTopo = 96; // onde a última carta gruda na pilha (px do topo da tela)
+  let pilhaBase = 96; // onde a primeira carta gruda
   const DEGRAU = 16; // quanto de cada card de trás aparece em cima da pilha (px)
   const VIS = Math.min(N - 1, 5); // quantos cards de trás aparecem
   let modo = null, frente = 0, aviso, animando = false;
@@ -294,7 +295,7 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   // auto = troca sozinha (um pouco mais lenta)
   let ultimoToque = 0;
   const proximo = (auto) => {
-    if (animando) return;
+    if (animando || !modo) return;
     if (auto !== true) ultimoToque = Date.now();
     animando = true;
     const c = cards[frente];
@@ -316,63 +317,71 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     if (naTela && document.visibilityState === "visible" && Date.now() - ultimoToque > 6000) proximo(true);
   };
   const iniciaBaralho = () => {
-    aviso = document.createElement("p");
-    aviso.className = "js-aviso-baralho text-center text-xs text-neutral-500 pt-3";
-    grade.after(aviso);
-    cards.forEach((c) => {
-      gsap.set(c, { transformOrigin: "50% 0%", force3D: true });
-      c.addEventListener("click", proximo);
-    });
+    if (!aviso) {
+      aviso = document.createElement("p");
+      aviso.className = "js-aviso-baralho text-center text-xs text-neutral-500 pt-3";
+      grade.after(aviso);
+      cards.forEach((c) => c.addEventListener("click", proximo));
+    }
+    aviso.style.visibility = "";
+    cards.forEach((c) => gsap.set(c, { transformOrigin: "50% 0%", force3D: true }));
+    clearInterval(relogio);
     relogio = setInterval(autoTroca, 3500);
     try { localStorage.setItem("pilhaServicos", hoje); } catch {}
   };
   const alturaCompacta = () => `${Math.max(...cards.map((c) => c.offsetHeight)) + VIS * DEGRAU}px`;
-  // passa para o bloco compacto, segurando na tela o que a pessoa está vendo (sem pular)
-  const compacta = () => {
-    const html = document.documentElement;
-    html.style.overflowAnchor = "none"; // a compensação é feita aqui, não pelo navegador
-    const rg = grade.getBoundingClientRect();
-    const refFrente = rg.bottom > 0; // pilha ainda na tela: segura o card da frente
-    const antes = refFrente ? cards[frente].getBoundingClientRect().top : rg.bottom;
-    modo = "compacto";
-    grade.classList.add("baralho");
-    grade.style.height = alturaCompacta();
-    desenhaBaralho(0);
-    gsap.ticker.tick(); // aplica as posições já, para medir certo
-    const depois = refFrente ? cards[frente].getBoundingClientRect().top : grade.getBoundingClientRect().bottom;
-    scrollBy({ top: depois - antes, behavior: "instant" });
-    html.style.overflowAnchor = "";
-    // recalcula as animações das seções de baixo (a página encurtou); fora deste callback
-    setTimeout(() => ScrollTrigger.refresh(), 0);
+  // Modo fixo + a pessoa sobe a página: a pilha volta a ser a pilha do scroll (desempilha ao subir,
+  // empilha de novo ao descer). A altura da página nunca muda durante a visita — no iPhone, mexer na
+  // altura com o dedo ainda rolando fazia o Safari ignorar o ajuste e jogar a tela para o fim.
+  const voltaPilha = () => {
+    modo = null;
+    clearInterval(relogio);
+    if (aviso) aviso.style.visibility = "hidden";
+    cards.forEach((c, i) => {
+      gsap.killTweensOf(c, "top,opacity,x,y,rotation");
+      c.style.zIndex = String(i + 1);
+      c.removeAttribute("aria-hidden");
+      // volta para o degrau da pilha (o mesmo top do CSS) e depois devolve o controle ao CSS
+      gsap.to(c, {
+        top: pilhaBase + i * DEGRAU,
+        x: 0,
+        y: 0,
+        rotation: 0,
+        opacity: 1,
+        duration: 0.3,
+        ease: "sine.out",
+        onComplete: () => gsap.set(c, { clearProps: "top,zIndex" }),
+      });
+    });
+    addEventListener("scroll", desenhaPilha, { passive: true });
+    desenhaPilha();
   };
-  // no modo fixo, ao voltar a subir a página, a pilha vira o bloco compacto
-  let ultimoY = scrollY;
+  // no modo fixo, ao subir mais que um pouquinho, a pilha volta a desempilhar com o scroll
+  let maiorY = scrollY;
   const vigiaSubida = () => {
     if (modo !== "fixo") return removeEventListener("scroll", vigiaSubida);
-    if (scrollY < ultimoY - 4) {
+    maiorY = Math.max(maiorY, scrollY);
+    if (scrollY < maiorY - 24) {
       removeEventListener("scroll", vigiaSubida);
-      compacta();
+      voltaPilha();
     }
-    ultimoY = scrollY;
   };
 
   // ---- pilha presa ao scroll (só no 1º acesso do dia) ----
   // o encolher/escurecer não salta junto com cada movimento do dedo: segue o scroll com um
-  // pequeno atraso suave (quickTo), e cada card vira uma camada própria da placa de vídeo
+  // pequeno atraso suave, e cada card vira uma camada própria da placa de vídeo
   cards.forEach((c) => gsap.set(c, { transformOrigin: "50% 0%", force3D: true, willChange: "transform", scale: 1, "--sombra": 0 }));
-  const suave = { duration: 0.45, ease: "power3.out" };
-  const escala = cards.map((c) => gsap.quickTo(c, "scale", suave));
-  const sombra = cards.map((c) => gsap.quickTo(c, "--sombra", suave));
   const desenhaPilha = () => {
     if (modo) return;
     const r = cards.map((c) => c.getBoundingClientRect());
     cards.forEach((c, i) => {
       const h = c.offsetHeight;
       const p = cards[i + 1] ? Math.min(1, Math.max(0, (r[i].top + h - r[i + 1].top) / h)) : 0;
-      escala[i](1 - 0.06 * p);
-      sombra[i](0.3 * p); // camada preta (leve), não filter
+      // camada preta (leve), não filter; overwrite "auto" substitui só escala e sombra
+      gsap.to(c, { scale: 1 - 0.06 * p, "--sombra": 0.3 * p, duration: 0.45, ease: "power3.out", overwrite: "auto" });
     });
     // o último card grudou sobre a pilha: vira baralho ali mesmo, sem mexer na página
+    pilhaBase = parseFloat(getComputedStyle(cards[0]).top);
     pilhaTopo = parseFloat(getComputedStyle(cards[N - 1]).top);
     if (r[N - 1].top <= pilhaTopo + 1) {
       removeEventListener("scroll", desenhaPilha);
@@ -380,11 +389,12 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
       frente = N - 1; // o último card (que acabou de cobrir a pilha) é o da frente
       iniciaBaralho();
       desenhaBaralho(0.35);
-      ultimoY = scrollY;
+      maiorY = scrollY;
       addEventListener("scroll", vigiaSubida, { passive: true });
     }
   };
   if (viuHoje) {
+    // acesso do mesmo dia: bloco compacto já ao carregar (sem dedo rolando, pode mudar a altura)
     modo = "compacto";
     iniciaBaralho();
     grade.classList.add("baralho");
