@@ -338,12 +338,24 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   addEventListener("touchstart", toque, { passive: true });
   addEventListener("touchend", toque, { passive: true });
   addEventListener("touchcancel", toque, { passive: true });
-  const compactaQuandoParar = () => {
+  let esperas = 0;
+  const compactaQuandoParar = (e) => {
+    if (e) esperas = 0; // rolou de novo: recomeça a contar
     clearTimeout(esperaParar);
-    esperaParar = setTimeout(() => (dedoNaTela ? compactaQuandoParar() : compacta()), 250);
+    // dedo ainda na tela: espera mais um pouco (no máximo ~2 s, caso o aviso de soltar se perca)
+    esperaParar = setTimeout(() => (dedoNaTela && esperas++ < 8 ? compactaQuandoParar() : compacta()), 250);
   };
   const compacta = () => {
     if (modo !== "fixo") return;
+    try {
+      compactaAgora();
+    } catch (erro) {
+      // se algo falhar no meio, não deixa a página num estado quebrado
+      console.error(erro);
+      document.documentElement.style.overflowAnchor = "";
+    }
+  };
+  const compactaAgora = () => {
     removeEventListener("scroll", compactaQuandoParar);
     const html = document.documentElement;
     html.style.overflowAnchor = "none"; // a compensação é feita aqui, não pelo navegador
@@ -360,7 +372,8 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     aviso.style.position = aviso.style.top = "";
     desenhaBaralho(0);
     gsap.ticker.tick(); // aplica as posições já, para medir certo
-    scrollBy({ top: ref() - antes, behavior: "instant" });
+    // forma numérica: o Safari do iPhone não aceita behavior "instant" e cancelava o ajuste
+    window.scrollBy(0, ref() - antes);
     html.style.overflowAnchor = "";
     setTimeout(() => ScrollTrigger.refresh(), 0); // seções de baixo mudaram de lugar
   };
