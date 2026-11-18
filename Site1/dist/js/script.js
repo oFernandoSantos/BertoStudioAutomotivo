@@ -320,7 +320,6 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     aviso.className = "js-aviso-baralho text-center text-xs text-neutral-500 pt-3";
     grade.after(aviso);
     cards.forEach((c) => {
-      c.style.transform = "";
       gsap.set(c, { transformOrigin: "50% 0%", force3D: true });
       c.addEventListener("click", proximo);
     });
@@ -358,15 +357,20 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   };
 
   // ---- pilha presa ao scroll (só no 1º acesso do dia) ----
+  // o encolher/escurecer não salta junto com cada movimento do dedo: segue o scroll com um
+  // pequeno atraso suave (quickTo), e cada card vira uma camada própria da placa de vídeo
+  cards.forEach((c) => gsap.set(c, { transformOrigin: "50% 0%", force3D: true, willChange: "transform", scale: 1, "--sombra": 0 }));
+  const suave = { duration: 0.45, ease: "power3.out" };
+  const escala = cards.map((c) => gsap.quickTo(c, "scale", suave));
+  const sombra = cards.map((c) => gsap.quickTo(c, "--sombra", suave));
   const desenhaPilha = () => {
     if (modo) return;
     const r = cards.map((c) => c.getBoundingClientRect());
     cards.forEach((c, i) => {
       const h = c.offsetHeight;
       const p = cards[i + 1] ? Math.min(1, Math.max(0, (r[i].top + h - r[i + 1].top) / h)) : 0;
-      c.style.transformOrigin = "50% 0%";
-      c.style.transform = p ? `scale(${1 - 0.08 * p})` : "";
-      c.style.setProperty("--sombra", (0.3 * p).toFixed(3)); // camada preta (leve), não filter
+      escala[i](1 - 0.06 * p);
+      sombra[i](0.3 * p); // camada preta (leve), não filter
     });
     // o último card grudou sobre a pilha: vira baralho ali mesmo, sem mexer na página
     pilhaTopo = parseFloat(getComputedStyle(cards[N - 1]).top);
@@ -401,7 +405,7 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
       c.removeEventListener("click", proximo);
       c.removeAttribute("aria-hidden");
       gsap.killTweensOf(c);
-      gsap.set(c, { clearProps: "transform,filter,top,opacity,zIndex,transformOrigin,--sombra" });
+      gsap.set(c, { clearProps: "transform,filter,top,opacity,zIndex,transformOrigin,willChange,--sombra" });
     });
   };
 });
