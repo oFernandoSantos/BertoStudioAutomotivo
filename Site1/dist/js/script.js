@@ -67,6 +67,20 @@ if (typeof WHATSAPP !== "undefined") {
 // HERO: fixa a seção e usa o scroll para avançar o vídeo e trocar as legendas
 const video = document.querySelector(".js-hero-video");
 const [c1, c2, c3] = document.querySelectorAll(".js-caption");
+// Safari do iPhone: o vídeo só toca sozinho se estiver sem som e "inline"; e com "Modo de Pouca
+// Energia" ou "Pouco Uso de Dados" ele bloqueia mesmo assim. Nesse caso, o primeiro toque na tela
+// (ou tecla) libera o vídeo. `depois` roda quando ele finalmente começa (ex.: pausar no computador).
+video.muted = true;
+video.defaultMuted = true;
+video.setAttribute("playsinline", "");
+const tocaQuandoPuder = (depois) => {
+  const eventos = ["touchstart", "pointerdown", "keydown"];
+  const solta = () => eventos.forEach((e) => removeEventListener(e, tenta));
+  const tenta = () => video.play().then(() => { solta(); if (depois) depois(); }).catch(() => {});
+  video.play()
+    .then(() => { if (depois) depois(); })
+    .catch(() => eventos.forEach((e) => addEventListener(e, tenta, { passive: true })));
+};
 
 
 // Tela larga: o hero fica preso na tela e o scroll controla o vídeo.
@@ -90,7 +104,7 @@ gsap.matchMedia().add(
       let alvo = BASE, atual = BASE, ultimo = scrollY, tUltimo = performance.now(), quadro;
       video.loop = true;
       video.playbackRate = BASE;
-      video.play().catch(() => {});
+      tocaQuandoPuder();
       // A velocidade do giro acompanha a velocidade da rolagem (px por ms): rolar devagar
       // acelera pouco, rolar rápido acelera muito; para cima ou para baixo, tanto faz.
       const aoRolar = () => {
@@ -175,7 +189,7 @@ gsap.matchMedia().add(
     }
 
     // iOS só carrega o vídeo depois de um play; toca e pausa logo em seguida
-    video.play().then(() => video.pause()).catch(() => {});
+    tocaQuandoPuder(() => video.pause());
     gsap
       .timeline({
         scrollTrigger: {
@@ -237,8 +251,8 @@ gsap.utils.toArray(".js-reveal").forEach((el) => {
 
 // Celular: cards de serviços.
 // 1º acesso do dia: rolando, os cards grudam no topo e empilham (o coberto encolhe e escurece).
-// Quando o último card empilha, a pilha vira um "baralho": fica parada e mostra um card por vez;
-// tocar passa para o próximo. Nos outros acessos do mesmo dia já abre direto no baralho.
+// Quando o último card empilha, a pilha vira um "baralho" ali mesmo e mostra um card por vez;
+// tocar (ou esperar) passa para o próximo. Nos outros acessos do mesmo dia já abre direto no baralho.
 gsap.matchMedia().add("(max-width: 767px)", () => {
   const cards = gsap.utils.toArray(".card-servico");
   const grade = cards[0]?.parentElement;
@@ -249,17 +263,23 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   try { viuHoje = localStorage.getItem("pilhaServicos") === hoje; } catch {}
 
   // ---- baralho: um card por vez, os de trás aparecem como degraus em cima ----
+  // modo "fixo": 1º acesso, logo depois de empilhar — os cards continuam grudados no topo da tela
+  //   (sticky), sem mudar a altura da página: nada pula, nem com o embalo do dedo.
+  // modo "compacto": cards um sobre o outro num bloco baixo (acessos seguintes do dia, ou quando
+  //   a pessoa volta a subir a página depois de empilhar).
   let pilhaTopo = 96; // onde a última carta gruda na pilha (px do topo da tela)
   const DEGRAU = 16; // quanto de cada card de trás aparece em cima da pilha (px)
-  let frente = 0, aviso, animando = false;
+  const VIS = Math.min(N - 1, 5); // quantos cards de trás aparecem
+  let modo = null, frente = 0, aviso, animando = false;
   const desenhaBaralho = (dur = 0.45) => {
+    const base = modo === "fixo" ? pilhaTopo : VIS * DEGRAU;
     cards.forEach((c, i) => {
       const k = (i - frente + N) % N; // 0 = card da frente
       const kk = Math.min(k, 5);
       c.style.zIndex = String(N - k);
       c.setAttribute("aria-hidden", k ? "true" : "false");
       gsap.to(c, {
-        top: (N > 5 ? 5 : N - 1) * DEGRAU - kk * DEGRAU,
+        top: base - kk * DEGRAU,
         scale: 1 - kk * 0.025,
         "--sombra": kk * 0.06, // escurece por uma camada preta (mais leve que filter)
         opacity: k > 5 ? 0 : 1,
@@ -270,8 +290,8 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     });
     aviso.textContent = `${frente + 1} / ${N} · toque para ver o próximo`;
   };
-  // toque: o card da frente pula, vira para o lado e cai no fundo da pilha
-  // auto = troca sozinha (mais lenta e com pulo menor, para ficar suave)
+  // toque: o card da frente dá um pulo curto, passa para trás da pilha e assenta devagar
+  // auto = troca sozinha (um pouco mais lenta)
   let ultimoToque = 0;
   const proximo = (auto) => {
     if (animando) return;
@@ -279,7 +299,6 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     animando = true;
     const c = cards[frente];
     const lento = auto === true ? 1.3 : 1;
-    // sai com um pulo curto e macio, passa para trás da pilha e assenta devagar (sem quique)
     gsap
       .timeline({ onComplete: () => (animando = false) })
       .to(c, { y: -45, x: 14, rotation: 3, duration: 0.35 * lento, ease: "sine.out" })
@@ -289,75 +308,92 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
       })
       .to(c, { y: 0, x: 0, rotation: 0, duration: 0.6 * lento, ease: "sine.inOut" });
   };
-
   // sem toque: troca sozinha a cada 3,5 s, só com o baralho na tela; depois de um toque espera 6 s
   let relogio;
   const autoTroca = () => {
-    const r = grade.getBoundingClientRect();
+    const r = cards[frente].getBoundingClientRect();
     const naTela = r.bottom > 0 && r.top < innerHeight;
     if (naTela && document.visibilityState === "visible" && Date.now() - ultimoToque > 6000) proximo(true);
   };
-  const viraBaralho = () => {
-    const topoAntes = grade.getBoundingClientRect().top;
-    grade.classList.add("baralho");
+  const iniciaBaralho = () => {
     aviso = document.createElement("p");
     aviso.className = "js-aviso-baralho text-center text-xs text-neutral-500 pt-3";
     grade.after(aviso);
     cards.forEach((c) => {
-      c.style.transform = c.style.filter = "";
+      c.style.transform = "";
       gsap.set(c, { transformOrigin: "50% 0%", force3D: true });
       c.addEventListener("click", proximo);
     });
-    grade.style.height = `${Math.max(...cards.map((c) => c.offsetHeight)) + (N > 5 ? 5 : N - 1) * DEGRAU}px`;
-    desenhaBaralho(0);
     relogio = setInterval(autoTroca, 3500);
-    // mantém o baralho no lugar da tela onde a pilha estava (a página encurta muito).
-    // No celular a rolagem continua no embalo depois que o dedo solta e, com a página mais curta,
-    // levava direto para o fim: trava a rolagem por um instante para parar o embalo e reposiciona.
-    if (topoAntes < 0) {
-      const html = document.documentElement;
-      html.style.overflow = "hidden";
-      // carta da frente no mesmo ponto da tela em que estava a última carta da pilha
-      const alvo = grade.getBoundingClientRect().top + scrollY - (pilhaTopo - (N > 5 ? 5 : N - 1) * DEGRAU);
-      scrollTo({ top: alvo, behavior: "instant" });
-      setTimeout(() => {
-        html.style.overflow = "";
-        scrollTo({ top: alvo, behavior: "instant" });
-      }, 350);
-    }
     try { localStorage.setItem("pilhaServicos", hoje); } catch {}
-    // recalcula as animações das seções de baixo (a página encurtou); fora deste callback do
-    // matchMedia, senão o refresh desfaz o próprio callback
+  };
+  const alturaCompacta = () => `${Math.max(...cards.map((c) => c.offsetHeight)) + VIS * DEGRAU}px`;
+  // passa para o bloco compacto, segurando na tela o que a pessoa está vendo (sem pular)
+  const compacta = () => {
+    const html = document.documentElement;
+    html.style.overflowAnchor = "none"; // a compensação é feita aqui, não pelo navegador
+    const rg = grade.getBoundingClientRect();
+    const refFrente = rg.bottom > 0; // pilha ainda na tela: segura o card da frente
+    const antes = refFrente ? cards[frente].getBoundingClientRect().top : rg.bottom;
+    modo = "compacto";
+    grade.classList.add("baralho");
+    grade.style.height = alturaCompacta();
+    desenhaBaralho(0);
+    gsap.ticker.tick(); // aplica as posições já, para medir certo
+    const depois = refFrente ? cards[frente].getBoundingClientRect().top : grade.getBoundingClientRect().bottom;
+    scrollBy({ top: depois - antes, behavior: "instant" });
+    html.style.overflowAnchor = "";
+    // recalcula as animações das seções de baixo (a página encurtou); fora deste callback
     setTimeout(() => ScrollTrigger.refresh(), 0);
+  };
+  // no modo fixo, ao voltar a subir a página, a pilha vira o bloco compacto
+  let ultimoY = scrollY;
+  const vigiaSubida = () => {
+    if (modo !== "fixo") return removeEventListener("scroll", vigiaSubida);
+    if (scrollY < ultimoY - 4) {
+      removeEventListener("scroll", vigiaSubida);
+      compacta();
+    }
+    ultimoY = scrollY;
   };
 
   // ---- pilha presa ao scroll (só no 1º acesso do dia) ----
   const desenhaPilha = () => {
-    if (grade.classList.contains("baralho")) return;
+    if (modo) return;
     const r = cards.map((c) => c.getBoundingClientRect());
     cards.forEach((c, i) => {
       const h = c.offsetHeight;
       const p = cards[i + 1] ? Math.min(1, Math.max(0, (r[i].top + h - r[i + 1].top) / h)) : 0;
       c.style.transformOrigin = "50% 0%";
       c.style.transform = p ? `scale(${1 - 0.08 * p})` : "";
-      c.style.filter = p ? `brightness(${1 - 0.3 * p})` : "";
+      c.style.setProperty("--sombra", (0.3 * p).toFixed(3)); // camada preta (leve), não filter
     });
-    // o último card grudou sobre a pilha: vira baralho
-    const ultimo = cards[N - 1];
-    pilhaTopo = parseFloat(getComputedStyle(ultimo).top);
+    // o último card grudou sobre a pilha: vira baralho ali mesmo, sem mexer na página
+    pilhaTopo = parseFloat(getComputedStyle(cards[N - 1]).top);
     if (r[N - 1].top <= pilhaTopo + 1) {
       removeEventListener("scroll", desenhaPilha);
-      viraBaralho();
+      modo = "fixo";
+      frente = N - 1; // o último card (que acabou de cobrir a pilha) é o da frente
+      iniciaBaralho();
+      desenhaBaralho(0.35);
+      ultimoY = scrollY;
+      addEventListener("scroll", vigiaSubida, { passive: true });
     }
   };
-  if (viuHoje) viraBaralho();
-  else {
+  if (viuHoje) {
+    modo = "compacto";
+    iniciaBaralho();
+    grade.classList.add("baralho");
+    grade.style.height = alturaCompacta();
+    desenhaBaralho(0);
+  } else {
     addEventListener("scroll", desenhaPilha, { passive: true });
     desenhaPilha();
   }
   return () => {
     clearInterval(relogio);
     removeEventListener("scroll", desenhaPilha);
+    removeEventListener("scroll", vigiaSubida);
     grade.classList.remove("baralho");
     grade.style.height = "";
     document.querySelector(".js-aviso-baralho")?.remove();
