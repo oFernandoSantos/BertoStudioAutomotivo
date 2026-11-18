@@ -271,7 +271,27 @@
           playsinline
           preload="auto"
           aria-hidden="true"
+          data-celular="imgs/hero-mobile.mp4?v=33"
+          data-computador="imgs/hero.mp4?v=29"
+          data-capa-celular="imgs/hero-mobile-poster.webp?v=9"
+          data-capa-computador="imgs/hero-poster.webp?v=9"
         ></video>
+        <!-- Começa a baixar (e, no celular, a tocar) o vídeo na hora, sem esperar o GSAP e os outros
+             scripts carregarem; o script.js depois só assume o controle -->
+        <script>
+          (function () {
+            var v = document.querySelector(".js-hero-video");
+            var cel = matchMedia("(max-aspect-ratio: 4/3)").matches;
+            v.muted = true;
+            v.poster = cel ? v.dataset.capaCelular : v.dataset.capaComputador;
+            v.src = cel ? v.dataset.celular : v.dataset.computador;
+            if (cel) {
+              v.loop = true;
+              var p = v.play();
+              if (p && p.catch) p.catch(function () {});
+            }
+          })();
+        </script>
         <div
           class="estreito:hidden absolute inset-0 bg-gradient-to-t from-black/75 via-transparent via-40% to-black/40"
         ></div>
@@ -867,6 +887,6 @@
       defer
     ></script>
     <script src="js/dados.js?v=2" defer></script>
-    <script src="js/script.js?v=38" defer></script>
+    <script src="js/script.js?v=41" defer></script>
   </body>
 </html>
