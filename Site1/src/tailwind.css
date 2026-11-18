@@ -141,12 +141,12 @@ details summary::-webkit-details-marker {
 
 /* Efeito vidro (estilo Apple): menu do cabeçalho e menu do celular */
 .componente-vidro {
-  background: rgba(255, 255, 255, 0.1); /* fundo branco semitransparente */
-  backdrop-filter: blur(12px); /* desfoque do que está atrás */
-  -webkit-backdrop-filter: blur(12px); /* Safari/iOS */
+  background: rgba(8, 6, 14, 0.88); /* fundo quase preto: os textos ficam legíveis sobre o vídeo */
+  backdrop-filter: blur(14px); /* desfoque do que está atrás */
+  -webkit-backdrop-filter: blur(14px); /* Safari/iOS */
   border: 1px solid #562ab7; /* borda roxa */
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.6);
 }
 nav.componente-vidro.rounded-full {
   border-radius: 9999px; /* o menu do cabeçalho continua em formato de pílula */
