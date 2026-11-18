@@ -4,10 +4,24 @@
     <meta charset="UTF-8" />
     <!-- sem zoom: pinça e toque duplo não ampliam o site -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta
-      name="description"
-      content="Berto Studio Automotivo — estética automotiva em Colombo - PR: cuidados, lavagens, polimento, restauração de faróis e acessórios."
-    />
+    <meta name="description" content="Estética automotiva em Colombo - PR: lavagem técnica, polimento, vitrificação, higienização interna, restauração de faróis, insulfilm e acessórios. Orçamento pelo WhatsApp." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://bertostudioautomotivo.com.br/" />
+    <meta name="theme-color" content="#000000" />
+    <!-- Local (Google entende a cidade do negócio) -->
+    <meta name="geo.region" content="BR-PR" />
+    <meta name="geo.placename" content="Colombo" />
+    <!-- Prévia ao compartilhar no WhatsApp, Instagram, Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Berto Studio Automotivo" />
+    <meta property="og:title" content="Berto Studio Automotivo | Estética Automotiva em Colombo - PR" />
+    <meta property="og:description" content="Estética automotiva em Colombo - PR: lavagem técnica, polimento, vitrificação, higienização interna, restauração de faróis, insulfilm e acessórios. Orçamento pelo WhatsApp." />
+    <meta property="og:url" content="https://bertostudioautomotivo.com.br/" />
+    <meta property="og:image" content="https://bertostudioautomotivo.com.br/imgs/hero-poster.webp" />
+    <meta property="og:image:width" content="1920" />
+    <meta property="og:image:height" content="1080" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
@@ -34,11 +48,126 @@
     <link rel="preload" as="image" href="imgs/hero-poster.webp?v=9" media="(min-aspect-ratio: 4/3)" />
     <link rel="preload" as="image" href="imgs/logo.webp" />
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=65" />
+    <link rel="stylesheet" href="css/styles.css?v=68" />
     <link rel="icon" type="image/png" href="imgs/favicon.png?v=1" />
     <link rel="apple-touch-icon" href="imgs/apple-touch-icon.png" />
 
-    <title>Berto Studio Automotivo | Estética Automotiva</title>
+    <!-- Dados do negócio para o Google (aparece no Maps/pesquisa local) -->
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "AutoWash",
+      "@id": "https://bertostudioautomotivo.com.br/#negocio",
+      "name": "Berto Studio Automotivo",
+      "description": "Estúdio de estética automotiva em Colombo - PR.",
+      "url": "https://bertostudioautomotivo.com.br/",
+      "logo": "https://bertostudioautomotivo.com.br/imgs/logo.webp",
+      "image": "https://bertostudioautomotivo.com.br/imgs/hero-poster.webp",
+      "telephone": "+55 41 99681-7106",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "R. da Pedreira, 605 - A, Campo Pequeno",
+        "addressLocality": "Colombo",
+        "addressRegion": "PR",
+        "addressCountry": "BR"
+      },
+      "areaServed": [
+        "Colombo",
+        "Curitiba",
+        "Região Metropolitana de Curitiba"
+      ],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:00",
+          "closes": "18:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "08:00",
+          "closes": "16:00"
+        }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Serviços de estética automotiva",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Lavagem"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Lavagem de motor"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Higienização interna"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Polimento"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Vitrificação"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Cristalização de vidros"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Restauração de faróis"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Insulfilm"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Acessórios"
+            }
+          }
+        ]
+      }
+    }
+    </script>
+    <title>Estética Automotiva em Colombo - PR | Berto Studio Automotivo</title>
   </head>
   <body class="bg-black font-[Inter,sans-serif]">
     <!-- Filtro de distorção do efeito "vidro líquido" do menu (usado no CSS .liquid-glass) -->
@@ -154,7 +283,7 @@
             Seu carro com brilho de estúdio.
           </h1>
           <p class="text-lg md:text-2xl pt-3.5 text-neutral-200">
-            Estética automotiva de alto padrão
+            Estética automotiva de alto padrão em Colombo - PR
           </p>
           <p class="role-ver pt-8 estreito:pt-5 text-xs tracking-[0.3em] text-primaria uppercase">
             Role para ver <i class="bi bi-chevron-down"></i>
@@ -212,7 +341,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/lavagem.webp?v=20"
-                alt=""
+                alt="Carro coberto de espuma na lavagem técnica"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -235,7 +364,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/lavagem-motor.webp?v=20"
-                alt=""
+                alt="Cofre do motor limpo"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -258,7 +387,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/higienizacao.webp?v=20"
-                alt=""
+                alt="Higienização do painel do carro com pincel"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -281,7 +410,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/polimento.webp?v=20"
-                alt=""
+                alt="Polimento da pintura com politriz"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -304,7 +433,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/vitrificacao.webp?v=20"
-                alt=""
+                alt="Pintura vitrificada com gotas de água"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -327,7 +456,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/cristalizacao.webp?v=20"
-                alt=""
+                alt="Vidro cristalizado com gotas de água"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -350,7 +479,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/farois.webp?v=20"
-                alt=""
+                alt="Restauração de farol amarelado"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -373,7 +502,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/insulfilm.webp?v=20"
-                alt=""
+                alt="Aplicação de insulfilm no vidro do carro"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -396,7 +525,7 @@
             <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 src="imgs/servicos/acessorios.webp?v=20"
-                alt=""
+                alt="Interior do carro com iluminação roxa nos pedais"
                 width="800"
                 height="500"
                 loading="lazy"
@@ -660,7 +789,7 @@
           Chame no WhatsApp e receba seu orçamento.
         </p>
         <!-- Cartão único: horários lado a lado e o botão do WhatsApp embaixo -->
-        <div class="w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6 js-reveal">
+        <div class="w-full max-w-md rounded-2xl border border-primaria bg-white/[0.03] p-5 sm:p-6 js-reveal">
           <p class="flex items-center justify-center gap-2 text-sm font-semibold text-white pb-4">
             <i class="bi bi-clock-fill text-primaria"></i>Horários de atendimento
           </p>
@@ -738,6 +867,6 @@
       defer
     ></script>
     <script src="js/dados.js?v=2" defer></script>
-    <script src="js/script.js?v=32" defer></script>
+    <script src="js/script.js?v=34" defer></script>
   </body>
 </html>
