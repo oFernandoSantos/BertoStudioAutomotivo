@@ -248,6 +248,16 @@ html {
     cursor: pointer; /* posição e animação do toque: GSAP no script.js */
     transition: none;
   }
+  /* camada preta que escurece os cards de trás (GSAP muda --sombra; opacity é leve de animar) */
+  .baralho .card-servico::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #000;
+    opacity: var(--sombra, 0);
+    pointer-events: none;
+  }
 }
 .card-servico:hover {
   border-color: #562ab7; /* roxo só ao passar o mouse */
@@ -335,80 +345,75 @@ html {
   30%, 100% { transform: scale(1.6); opacity: 0; }
 }
 
-/* Botões de WhatsApp (contato e topo): pulso, anel que se espalha, reflexo de luz e ícone balançando */
+/* Botões de WhatsApp (contato e topo): brilho fixo suave, anel que se abre em volta mantendo o
+   formato de pílula, reflexo de luz rápido e ícone que dá um toque — o texto fica parado e nítido */
 .botao-chamativo {
   position: relative;
   overflow: visible;
   isolation: isolate;
-  animation: botao-pulso 2.4s ease-in-out infinite;
+  box-shadow: 0 6px 18px -6px rgba(37, 211, 102, 0.55), 0 0 22px rgba(37, 211, 102, 0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-/* anel verde que cresce e some */
+/* anel verde que se abre e some (pílula continua pílula: anima o inset, não a escala) */
 .botao-chamativo::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -2;
-  border-radius: inherit;
-  box-shadow: 0 0 18px rgba(37, 211, 102, 0.55);
+  border-radius: 9999px;
+  border: 2px solid rgba(92, 255, 157, 0.75);
   opacity: 0;
-  animation: botao-anel 2.4s ease-out infinite;
+  animation: botao-anel 2.8s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
   pointer-events: none;
 }
-/* reflexo de luz passando (preso ao formato do botão) */
+/* reflexo de luz cruzando o botão */
 .botao-chamativo::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: inherit;
-  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%) no-repeat;
-  background-size: 250% 100%;
-  animation: botao-reflexo 3.2s ease-in-out infinite;
+  border-radius: 9999px;
+  background: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0.55) 50%, transparent 60%) no-repeat;
+  background-size: 300% 100%;
+  animation: botao-reflexo 3.6s ease-in-out infinite;
   pointer-events: none;
 }
 .botao-chamativo .bi-whatsapp {
   display: inline-block;
-  animation: botao-icone 3.2s ease-in-out infinite;
+  animation: botao-icone 3.6s ease-in-out infinite;
 }
 .botao-chamativo:hover {
-  animation-play-state: paused;
-  transform: scale(1.03);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -6px rgba(37, 211, 102, 0.7), 0 0 30px rgba(37, 211, 102, 0.35);
 }
-@keyframes botao-pulso {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.025); }
+.botao-chamativo:active {
+  transform: translateY(0) scale(0.98);
 }
 @keyframes botao-anel {
-  0% { transform: scale(1); opacity: 0.9; }
-  60%, 100% { transform: scale(1.12, 1.35); opacity: 0; }
+  0% { inset: 0; opacity: 0.9; }
+  70%, 100% { inset: -12px; opacity: 0; }
 }
 @keyframes botao-reflexo {
-  0%, 55% { background-position: 130% 0; }
-  85%, 100% { background-position: -30% 0; }
+  0%, 60% { background-position: 120% 0; }
+  85%, 100% { background-position: -20% 0; }
 }
 @keyframes botao-icone {
-  0%, 70%, 100% { transform: rotate(0); }
-  75% { transform: rotate(-14deg); }
-  80% { transform: rotate(12deg); }
-  85% { transform: rotate(-8deg); }
-  90% { transform: rotate(0); }
+  0%, 62%, 100% { transform: rotate(0) scale(1); }
+  68% { transform: rotate(-16deg) scale(1.15); }
+  74% { transform: rotate(12deg) scale(1.15); }
+  80% { transform: rotate(-6deg) scale(1.05); }
+  86% { transform: rotate(0) scale(1); }
 }
-/* versão do botão do topo: pulso médio */
-.botao-chamativo.leve {
-  animation: botao-pulso-leve 2.6s ease-in-out infinite;
-}
+/* botão do topo (menor): anel mais curto */
 .botao-chamativo.leve::before {
-  animation-duration: 2.6s;
+  animation-name: botao-anel-leve;
 }
-.botao-chamativo.leve::after {
-  animation-duration: 3s;
-}
-@keyframes botao-pulso-leve {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+@keyframes botao-anel-leve {
+  0% { inset: 0; opacity: 0.8; }
+  70%, 100% { inset: -7px; opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .botao-chamativo, .botao-chamativo::before, .botao-chamativo::after, .botao-chamativo .bi-whatsapp,
+  .botao-chamativo::before, .botao-chamativo::after, .botao-chamativo .bi-whatsapp,
   .role-ver, .role-ver .bi-chevron-down, .botao-vibra, .botao-vibra::before { animation: none; }
 }
 

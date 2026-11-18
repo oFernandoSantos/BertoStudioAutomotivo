@@ -249,6 +249,7 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
   try { viuHoje = localStorage.getItem("pilhaServicos") === hoje; } catch {}
 
   // ---- baralho: um card por vez, os de trás aparecem como degraus em cima ----
+  let pilhaTopo = 96; // onde a última carta gruda na pilha (px do topo da tela)
   const DEGRAU = 16; // quanto de cada card de trás aparece em cima da pilha (px)
   let frente = 0, aviso, animando = false;
   const desenhaBaralho = (dur = 0.45) => {
@@ -260,10 +261,10 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
       gsap.to(c, {
         top: (N > 5 ? 5 : N - 1) * DEGRAU - kk * DEGRAU,
         scale: 1 - kk * 0.025,
-        filter: `brightness(${1 - kk * 0.06})`,
+        "--sombra": kk * 0.06, // escurece por uma camada preta (mais leve que filter)
         opacity: k > 5 ? 0 : 1,
         duration: dur,
-        ease: "power2.out",
+        ease: "sine.inOut",
         overwrite: "auto",
       });
     });
@@ -277,16 +278,18 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     if (auto !== true) ultimoToque = Date.now();
     animando = true;
     const c = cards[frente];
-    const lento = auto === true ? 1.8 : 1;
+    const lento = auto === true ? 1.3 : 1;
+    // sai com um pulo curto e macio, passa para trás da pilha e assenta devagar (sem quique)
     gsap
       .timeline({ onComplete: () => (animando = false) })
-      .to(c, { y: auto === true ? -60 : -90, x: auto === true ? 20 : 30, rotation: auto === true ? 5 : 8, duration: 0.25 * lento, ease: "power2.out" })
+      .to(c, { y: -45, x: 14, rotation: 3, duration: 0.35 * lento, ease: "sine.out" })
       .call(() => {
         frente = (frente + 1) % N;
-        desenhaBaralho(0.5 * lento);
+        desenhaBaralho(0.6 * lento);
       })
-      .to(c, { y: 0, x: 0, rotation: 0, duration: 0.5 * lento, ease: auto === true ? "power2.out" : "back.out(1.6)" });
+      .to(c, { y: 0, x: 0, rotation: 0, duration: 0.6 * lento, ease: "sine.inOut" });
   };
+
   // sem toque: troca sozinha a cada 3,5 s, só com o baralho na tela; depois de um toque espera 6 s
   let relogio;
   const autoTroca = () => {
@@ -302,14 +305,26 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     grade.after(aviso);
     cards.forEach((c) => {
       c.style.transform = c.style.filter = "";
-      gsap.set(c, { transformOrigin: "50% 0%" });
+      gsap.set(c, { transformOrigin: "50% 0%", force3D: true });
       c.addEventListener("click", proximo);
     });
     grade.style.height = `${Math.max(...cards.map((c) => c.offsetHeight)) + (N > 5 ? 5 : N - 1) * DEGRAU}px`;
     desenhaBaralho(0);
     relogio = setInterval(autoTroca, 3500);
-    // mantém o baralho no lugar da tela onde a pilha estava (a página encurta muito)
-    if (topoAntes < 0) scrollTo({ top: grade.getBoundingClientRect().top + scrollY - 96, behavior: "instant" });
+    // mantém o baralho no lugar da tela onde a pilha estava (a página encurta muito).
+    // No celular a rolagem continua no embalo depois que o dedo solta e, com a página mais curta,
+    // levava direto para o fim: trava a rolagem por um instante para parar o embalo e reposiciona.
+    if (topoAntes < 0) {
+      const html = document.documentElement;
+      html.style.overflow = "hidden";
+      // carta da frente no mesmo ponto da tela em que estava a última carta da pilha
+      const alvo = grade.getBoundingClientRect().top + scrollY - (pilhaTopo - (N > 5 ? 5 : N - 1) * DEGRAU);
+      scrollTo({ top: alvo, behavior: "instant" });
+      setTimeout(() => {
+        html.style.overflow = "";
+        scrollTo({ top: alvo, behavior: "instant" });
+      }, 350);
+    }
     try { localStorage.setItem("pilhaServicos", hoje); } catch {}
     // recalcula as animações das seções de baixo (a página encurtou); fora deste callback do
     // matchMedia, senão o refresh desfaz o próprio callback
@@ -329,7 +344,8 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
     });
     // o último card grudou sobre a pilha: vira baralho
     const ultimo = cards[N - 1];
-    if (r[N - 1].top <= parseFloat(getComputedStyle(ultimo).top) + 1) {
+    pilhaTopo = parseFloat(getComputedStyle(ultimo).top);
+    if (r[N - 1].top <= pilhaTopo + 1) {
       removeEventListener("scroll", desenhaPilha);
       viraBaralho();
     }
@@ -349,7 +365,7 @@ gsap.matchMedia().add("(max-width: 767px)", () => {
       c.removeEventListener("click", proximo);
       c.removeAttribute("aria-hidden");
       gsap.killTweensOf(c);
-      gsap.set(c, { clearProps: "transform,filter,top,opacity,zIndex,transformOrigin" });
+      gsap.set(c, { clearProps: "transform,filter,top,opacity,zIndex,transformOrigin,--sombra" });
     });
   };
 });
