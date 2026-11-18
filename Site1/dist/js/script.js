@@ -67,6 +67,20 @@ if (typeof WHATSAPP !== "undefined") {
 // HERO: fixa a seção e usa o scroll para avançar o vídeo e trocar as legendas
 const video = document.querySelector(".js-hero-video");
 const [c1, c2, c3] = document.querySelectorAll(".js-caption");
+// Safari do iPhone: o vídeo só toca sozinho se estiver sem som e "inline"; e com "Modo de Pouca
+// Energia" ou "Pouco Uso de Dados" ele bloqueia mesmo assim. Nesse caso, o primeiro toque na tela
+// (ou tecla) libera o vídeo. `depois` roda quando ele finalmente começa (ex.: pausar no computador).
+video.muted = true;
+video.defaultMuted = true;
+video.setAttribute("playsinline", "");
+const tocaQuandoPuder = (depois) => {
+  const eventos = ["touchstart", "pointerdown", "keydown"];
+  const solta = () => eventos.forEach((e) => removeEventListener(e, tenta));
+  const tenta = () => video.play().then(() => { solta(); if (depois) depois(); }).catch(() => {});
+  video.play()
+    .then(() => { if (depois) depois(); })
+    .catch(() => eventos.forEach((e) => addEventListener(e, tenta, { passive: true })));
+};
 
 
 // Tela larga: o hero fica preso na tela e o scroll controla o vídeo.
@@ -90,7 +104,7 @@ gsap.matchMedia().add(
       let alvo = BASE, atual = BASE, ultimo = scrollY, tUltimo = performance.now(), quadro;
       video.loop = true;
       video.playbackRate = BASE;
-      video.play().catch(() => {});
+      tocaQuandoPuder();
       // A velocidade do giro acompanha a velocidade da rolagem (px por ms): rolar devagar
       // acelera pouco, rolar rápido acelera muito; para cima ou para baixo, tanto faz.
       const aoRolar = () => {
@@ -175,7 +189,7 @@ gsap.matchMedia().add(
     }
 
     // iOS só carrega o vídeo depois de um play; toca e pausa logo em seguida
-    video.play().then(() => video.pause()).catch(() => {});
+    tocaQuandoPuder(() => video.pause());
     gsap
       .timeline({
         scrollTrigger: {
